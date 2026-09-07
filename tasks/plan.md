@@ -52,15 +52,15 @@ data it produces.
 
 ### Phase 3: PDF Viewer + Explain + Highlight
 - [x] Task 9: Backend `/documents` list + serve endpoints
-- [ ] Task 10: Frontend PDF viewer page (selectable text)
+- [x] Task 10: Frontend PDF viewer page (selectable text)
 - [x] Task 11: Backend `POST /explain`
-- [ ] Task 12: Frontend explain side panel
+- [x] Task 12: Frontend explain side panel
 
 ### Checkpoint: Viewer + Explain
 - [ ] Manual: open a CPE393 PDF, select text, get grounded explanation in side panel (spec Success Criteria #3-4)
 
-- [ ] Task 13: Backend `POST /highlights`
-- [ ] Task 14: Frontend "Save highlight" wiring
+- [x] Task 13: Backend `POST /highlights`
+- [x] Task 14: Frontend "Save highlight" wiring
 
 ### Checkpoint: Highlight loop
 - [ ] Manual: save a highlight, confirm `Highlight` node + relationships exist in Neo4j (spec Success Criteria #5)
