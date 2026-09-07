@@ -63,6 +63,41 @@ def test_chat_raises_when_reasoning_consumed_the_whole_budget():
     assert "max_tokens" in str(exc.value)
 
 
+def test_chat_retries_rate_limits_then_succeeds(monkeypatch):
+    from app.services import vllm_client
+
+    monkeypatch.setattr(vllm_client, "BACKOFF_SECONDS", 0.0)
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] < 3:
+            return httpx.Response(429, text="rate limit exceeded")
+        return httpx.Response(
+            200, json={"choices": [{"message": {"content": "recovered"}}]}
+        )
+
+    result = chat(
+        [{"role": "user", "content": "hi"}], transport=_mock_transport(handler)
+    )
+
+    assert result == "recovered"
+    assert calls["n"] == 3
+
+
+def test_chat_gives_up_after_repeated_rate_limits(monkeypatch):
+    from app.services import vllm_client
+
+    monkeypatch.setattr(vllm_client, "BACKOFF_SECONDS", 0.0)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(429, text="rate limit exceeded")
+
+    with pytest.raises(VLLMError) as exc:
+        chat([{"role": "user", "content": "hi"}], transport=_mock_transport(handler))
+    assert "429" in str(exc.value)
+
+
 def test_chat_raises_typed_error_on_timeout():
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectTimeout("timed out")

@@ -31,7 +31,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Ingest course material into Neo4j.")
     parser.add_argument("--class", dest="course", required=True, help="Course code, e.g. CPE393")
     parser.add_argument("--skip-entities", action="store_true", help="Chunk and embed only")
-    parser.add_argument("--workers", type=int, default=6, help="Parallel entity-extraction calls")
+    # The gateway caps parallel requests per key at 3; more just triggers 429s.
+    parser.add_argument("--workers", type=int, default=3, help="Parallel entity-extraction calls")
     args = parser.parse_args()
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))

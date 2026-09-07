@@ -1,8 +1,18 @@
+import logging
+import time
+
 import httpx
 
 from app.config import settings
 
 DEFAULT_TIMEOUT = 120.0
+
+# The gateway caps concurrent requests per API key (max_parallel_requests: 3).
+# Over that it returns 429, which is transient — retry rather than dropping work.
+MAX_RETRIES = 6
+BACKOFF_SECONDS = 2.0
+
+logger = logging.getLogger(__name__)
 
 
 class VLLMError(RuntimeError):
@@ -29,15 +39,21 @@ def chat(
     }
     headers = {"Authorization": f"Bearer {settings.vllm_api_key}"}
 
-    try:
-        with httpx.Client(timeout=DEFAULT_TIMEOUT, transport=transport) as client:
-            response = client.post(
-                f"{settings.vllm_url.rstrip('/')}/chat/completions",
-                json=payload,
-                headers=headers,
-            )
-    except httpx.HTTPError as exc:
-        raise VLLMError(f"vLLM request failed: {exc}") from exc
+    url = f"{settings.vllm_url.rstrip('/')}/chat/completions"
+
+    for attempt in range(MAX_RETRIES):
+        try:
+            with httpx.Client(timeout=DEFAULT_TIMEOUT, transport=transport) as client:
+                response = client.post(url, json=payload, headers=headers)
+        except httpx.HTTPError as exc:
+            raise VLLMError(f"vLLM request failed: {exc}") from exc
+
+        if response.status_code == 429 and attempt < MAX_RETRIES - 1:
+            delay = BACKOFF_SECONDS * (2**attempt)
+            logger.info("vLLM rate limited, retrying in %.0fs", delay)
+            time.sleep(delay)
+            continue
+        break
 
     if response.status_code != 200:
         raise VLLMError(
