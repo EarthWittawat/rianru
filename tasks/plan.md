@@ -81,8 +81,8 @@ data it produces.
 - [ ] Manual: chat answers a CPE393 question using retrieved chunks, not generic knowledge (spec Success Criteria #7)
 
 ### Phase 6: Quiz / Flashcards
-- [ ] Task 19: Backend `POST /quiz/generate`
-- [ ] Task 20: Frontend `/quiz` page (reveal/self-check)
+- [x] Task 19: Backend `POST /quiz/generate`
+- [x] Task 20: Frontend `/quiz` page (reveal/self-check)
 
 ### Checkpoint: Complete
 - [ ] Manual: `/quiz` generates topic questions, reveal/self-check works (spec Success Criteria #8)

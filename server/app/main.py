@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import chat, documents, explain, graph, highlights
+from app.routers import chat, documents, explain, graph, highlights, quiz
 from app.services.neo4j_client import check_connectivity
 
 app = FastAPI(title="Learning Tool API")
@@ -19,6 +19,7 @@ app.include_router(explain.router)
 app.include_router(highlights.router)
 app.include_router(graph.router)
 app.include_router(chat.router)
+app.include_router(quiz.router)
 
 
 @app.get("/health")

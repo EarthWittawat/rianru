@@ -44,6 +44,29 @@ export function documentFileUrl(id: string) {
   return `${API_BASE}/documents/${encodeURIComponent(id)}/file`;
 }
 
+export type QuizQuestion = {
+  id: string;
+  format: "multiple_choice" | "short_answer";
+  question: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+  topic?: string;
+};
+
+export function generateQuiz(topic: string, count = 6) {
+  return post<{ topic: string; questions: QuizQuestion[] }>("/quiz/generate", {
+    topic,
+    count,
+  });
+}
+
+export function getStoredQuiz(topic: string) {
+  return get<{ questions: QuizQuestion[] }>(
+    `/quiz?topic=${encodeURIComponent(topic)}`,
+  );
+}
+
 export type ChatSource = {
   chunk_id: string;
   document_id: string;

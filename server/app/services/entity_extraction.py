@@ -32,7 +32,7 @@ def extract_graph_from_text(text: str) -> tuple[list[dict], list[dict]]:
 
 def parse_extraction_response(raw: str) -> tuple[list[dict], list[dict]]:
     """Parse the model's JSON. Malformed output yields empty lists, not an error."""
-    payload = _load_json(raw)
+    payload = load_json_object(raw)
     if payload is None:
         logger.warning("Entity extraction returned unparseable JSON: %.120s", raw)
         return [], []
@@ -70,7 +70,8 @@ def parse_extraction_response(raw: str) -> tuple[list[dict], list[dict]]:
     return entities, relations
 
 
-def _load_json(raw: str) -> dict | None:
+def load_json_object(raw: str) -> dict | None:
+    """Pull a JSON object out of model output, fenced or surrounded by prose."""
     for candidate in _candidates(raw):
         try:
             parsed = json.loads(candidate)
