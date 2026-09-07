@@ -27,7 +27,11 @@ def save_highlight(request: HighlightRequest) -> dict:
                 selected_text: $selected_text,
                 explanation: $explanation,
                 page: c.page,
-                created_at: datetime()
+                created_at: datetime(),
+                // Anchors so a re-ingest, which replaces every chunk, can
+                // find this highlight again and re-attach it.
+                document_id: d.id,
+                chunk_index: c.index
             })
             RETURN h.id AS id, d.title AS document_title, d.id AS document_id
             """,

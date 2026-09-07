@@ -51,6 +51,9 @@ def write_document(
     ]
 
     with get_driver().session() as session:
+        # Chunks are replaced wholesale on re-ingest, which would sever any
+        # highlights hanging off them. Highlights are the student's own work,
+        # so they are detached here and re-attached by chunk index below.
         session.run(
             """
             MERGE (d:Document {id: $doc_id})
@@ -87,6 +90,16 @@ def write_document(
             """,
             doc_id=doc_id,
             rows=rows,
+        )
+        session.run(
+            """
+            MATCH (h:Highlight {document_id: $doc_id})
+            WHERE NOT (:Chunk)-[:HAS_HIGHLIGHT]->(h)
+            MATCH (d:Document {id: $doc_id})-[:HAS_CHUNK]->(c:Chunk)
+            WHERE c.index = h.chunk_index
+            MERGE (c)-[:HAS_HIGHLIGHT]->(h)
+            """,
+            doc_id=doc_id,
         )
     return len(rows)
 

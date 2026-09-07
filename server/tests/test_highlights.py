@@ -88,6 +88,66 @@ def test_highlight_mentions_entities_found_in_the_selection():
     assert "Tokenization" in mentioned
 
 
+def test_highlights_survive_reingesting_the_document():
+    """Re-running ingest must not destroy the student's own saved work."""
+    from app.services.chunking import Chunk
+    from app.services.graph_store import write_document
+
+    doc_id = "pytest-reingest-doc"
+    chunks = [
+        Chunk(text="Stemming reduces words to a root form.", source_path="a.pdf", page=1),
+        Chunk(text="Lemmatization uses a dictionary instead.", source_path="a.pdf", page=2),
+    ]
+    write_kwargs = dict(
+        doc_id=doc_id,
+        title="Re-ingest Doc",
+        course="CPE393",
+        topic="Testing",
+        activity_type="material",
+        file_path="a.pdf",
+        chunks=chunks,
+    )
+    write_document(**write_kwargs)
+
+    saved = client.post(
+        "/highlights",
+        json={
+            "chunk_id": f"{doc_id}::1",
+            "selected_text": "PYTEST survives re-ingest",
+            "explanation": "should still be attached afterwards",
+        },
+    )
+    assert saved.status_code == 200
+    highlight_id = saved.json()["id"]
+
+    write_document(**write_kwargs)
+
+    try:
+        with get_driver().session() as session:
+            record = session.run(
+                """
+                MATCH (h:Highlight {id: $id})
+                OPTIONAL MATCH (c:Chunk)-[:HAS_HIGHLIGHT]->(h)
+                RETURN c.id AS chunk_id, c.text AS chunk_text
+                """,
+                id=highlight_id,
+            ).single()
+
+        assert record["chunk_id"] == f"{doc_id}::1", (
+            "highlight was orphaned by re-ingest"
+        )
+        assert "Lemmatization" in record["chunk_text"]
+    finally:
+        with get_driver().session() as session:
+            session.run(
+                "MATCH (d:Document {id: $id}) "
+                "OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:Chunk) "
+                "OPTIONAL MATCH (c)-[:HAS_HIGHLIGHT]->(h:Highlight) "
+                "DETACH DELETE d, c, h",
+                id=doc_id,
+            )
+
+
 def test_unknown_chunk_returns_404():
     response = client.post(
         "/highlights",

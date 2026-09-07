@@ -44,6 +44,26 @@ export function documentFileUrl(id: string) {
   return `${API_BASE}/documents/${encodeURIComponent(id)}/file`;
 }
 
+export type GraphNode = {
+  id: string;
+  label: string;
+  type: "Document" | "Entity" | "Highlight";
+  topic?: string;
+  entity_type?: string;
+  explanation?: string;
+};
+
+export type GraphEdge = { source: string; target: string; label: string };
+
+export function getGraph(topic?: string) {
+  const query = topic ? `?topic=${encodeURIComponent(topic)}` : "";
+  return get<{ nodes: GraphNode[]; edges: GraphEdge[] }>(`/graph${query}`);
+}
+
+export function getTopics() {
+  return get<string[]>("/graph/topics");
+}
+
 export type Explanation = {
   explanation: string;
   selected_text: string;

@@ -67,8 +67,8 @@ data it produces.
 - [ ] Review with human before proceeding
 
 ### Phase 4: Knowledge Graph
-- [ ] Task 15: Backend `GET /graph` (nodes/edges, topic filter)
-- [ ] Task 16: Frontend `/graph` page (force-directed render, click-through)
+- [x] Task 15: Backend `GET /graph` (nodes/edges, topic filter)
+- [x] Task 16: Frontend `/graph` page (force-directed render, click-through)
 
 ### Checkpoint: Graph
 - [ ] Manual: `/graph` shows real ingested + highlight data; clicking a node surfaces its source (spec Success Criteria #6)
