@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProgressSummary } from "@/components/ProgressSummary";
 
 const SECTIONS = [
   {
@@ -30,6 +31,13 @@ export default function Home() {
       <p className="mt-2 text-neutral-600">
         Your course material, made interactive.
       </p>
+
+      <section className="mt-10">
+        <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+          Where you stand
+        </h2>
+        <ProgressSummary />
+      </section>
 
       <ul className="mt-10 grid gap-3 sm:grid-cols-2">
         {SECTIONS.map(({ href, label, description }) => (

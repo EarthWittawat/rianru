@@ -45,6 +45,32 @@ export function documentFileUrl(id: string) {
   return `${API_BASE}/documents/${encodeURIComponent(id)}/file`;
 }
 
+export type TopicStat = {
+  topic: string;
+  attempted: number;
+  correct: number;
+  accuracy: number;
+  last_attempt_at: string;
+};
+
+export function recordAttempt(
+  questionId: string,
+  grade: { chosen_answer: string } | { self_grade: boolean },
+) {
+  return post<{ is_correct: boolean; correct_answer: string; graded_by: string }>(
+    "/progress/attempts",
+    { question_id: questionId, ...grade },
+  );
+}
+
+export function getTopicStats() {
+  return get<TopicStat[]>("/progress/topics");
+}
+
+export function getWeakTopics(limit = 5) {
+  return get<TopicStat[]>(`/progress/weak?limit=${limit}`);
+}
+
 export type QuizQuestion = {
   id: string;
   format: "multiple_choice" | "short_answer";
