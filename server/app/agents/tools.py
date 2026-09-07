@@ -9,7 +9,7 @@ import json
 
 from langchain.tools import tool
 
-from app.services import progress, quiz
+from app.services import progress
 from app.services.graph_store import similarity_search
 from app.services.neo4j_client import get_driver
 
