@@ -17,6 +17,7 @@ export type DocumentChunk = {
   text: string;
   page: number | null;
   cell_index: number | null;
+  cell_type: "code" | "markdown" | null;
   index: number;
 };
 

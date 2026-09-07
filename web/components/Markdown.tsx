@@ -1,6 +1,7 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import { CodeBlock } from "@/components/CodeBlock";
 
 /** The tutor answers in markdown, so it needs rendering rather than printing. */
 export function Markdown({ children }: { children: string }) {
@@ -18,16 +19,21 @@ export function Markdown({ children }: { children: string }) {
           strong: ({ children }) => (
             <strong className="font-semibold text-neutral-900">{children}</strong>
           ),
-          code: ({ children }) => (
-            <code className="rounded bg-neutral-100 px-1 py-0.5 font-mono text-[0.85em]">
-              {children}
-            </code>
-          ),
-          pre: ({ children }) => (
-            <pre className="overflow-x-auto rounded-md bg-neutral-900 p-3 text-xs text-neutral-100">
-              {children}
-            </pre>
-          ),
+          code: ({ className, children }) => {
+            const text = String(children);
+            // react-markdown gives fenced blocks a language- class and inline
+            // code none; only the fenced ones get the highlighter.
+            const language = /language-(\w+)/.exec(className ?? "")?.[1];
+            if (!language && !text.includes("\n")) {
+              return (
+                <code className="rounded bg-neutral-100 px-1 py-0.5 font-mono text-[0.85em]">
+                  {children}
+                </code>
+              );
+            }
+            return <CodeBlock code={text} language={language ?? "python"} />;
+          },
+          pre: ({ children }) => <>{children}</>,
           h1: ({ children }) => (
             <h3 className="font-semibold text-neutral-900">{children}</h3>
           ),

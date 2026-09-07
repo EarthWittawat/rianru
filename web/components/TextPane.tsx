@@ -3,6 +3,8 @@
 import { useCallback } from "react";
 import type { DocumentChunk } from "@/lib/api";
 import type { Selection } from "@/components/PdfPane";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Markdown } from "@/components/Markdown";
 
 type Props = {
   chunks: DocumentChunk[];
@@ -23,21 +25,32 @@ export function TextPane({ chunks, onSelect }: Props) {
     >
       <div className="mx-auto max-w-3xl space-y-3">
         {chunks.map((chunk) => (
-          <article
-            key={chunk.id}
-            className="rounded-md bg-white p-5 shadow-sm ring-1 ring-neutral-200"
-          >
-            {chunk.cell_index !== null && (
-              <span className="mb-2 block font-mono text-xs text-neutral-400">
-                cell {chunk.cell_index}
-              </span>
-            )}
-            <pre className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-neutral-800">
-              {chunk.text}
-            </pre>
-          </article>
+          <Cell key={chunk.id} chunk={chunk} />
         ))}
       </div>
     </div>
+  );
+}
+
+function Cell({ chunk }: { chunk: DocumentChunk }) {
+  const isCode = chunk.cell_type === "code";
+
+  return (
+    <article className="overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-neutral-200">
+      {chunk.cell_index !== null && (
+        <div className="flex items-center gap-2 border-b border-neutral-100 px-4 py-1.5">
+          <span className="font-mono text-[11px] text-neutral-400">
+            {isCode ? "In" : "Md"} [{chunk.cell_index}]
+          </span>
+        </div>
+      )}
+      <div className={isCode ? "p-3" : "px-5 py-4"}>
+        {isCode ? (
+          <CodeBlock code={chunk.text} showLineNumbers />
+        ) : (
+          <Markdown>{chunk.text}</Markdown>
+        )}
+      </div>
+    </article>
   );
 }

@@ -46,7 +46,8 @@ def get_document(document_id: str) -> dict:
             """
             MATCH (:Document {id: $id})-[:HAS_CHUNK]->(c:Chunk)
             RETURN c.id AS id, c.text AS text, c.page AS page,
-                   c.cell_index AS cell_index, c.index AS index
+                   c.cell_index AS cell_index, c.cell_type AS cell_type,
+                   c.index AS index
             ORDER BY c.index
             """,
             id=document_id,
