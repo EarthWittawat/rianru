@@ -28,7 +28,7 @@ data it produces.
 
 ### Phase 1: Foundation
 - [x] Task 1: Neo4j via Docker Compose
-- [ ] Task 2: FastAPI backend skeleton + Neo4j connection
+- [x] Task 2: FastAPI backend skeleton + Neo4j connection
 - [ ] Task 3: Next.js frontend skeleton
 
 ### Checkpoint: Foundation

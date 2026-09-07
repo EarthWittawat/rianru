@@ -26,17 +26,17 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 
 ---
 
-### Task 2: FastAPI backend skeleton + Neo4j connection
+### Task 2: FastAPI backend skeleton + Neo4j connection ✅
 **Description:** Scaffold `server/` with FastAPI app, `.env` loading (`VLLM_URL`, `VLLM_MODEL`, `VLLM_API_KEY`, Neo4j creds), a Neo4j driver service, and a `/health` endpoint that round-trips a Neo4j query.
 
 **Acceptance criteria:**
-- [ ] `uvicorn app.main:app --reload --port 8000` runs
-- [ ] `GET /health` returns 200 and confirms Neo4j connectivity
-- [ ] Config loaded from `.env` via `pydantic-settings` (no hardcoded secrets)
+- [x] `uvicorn app.main:app --reload --port 8000` runs
+- [x] `GET /health` returns 200 and confirms Neo4j connectivity
+- [x] Config loaded from `.env` via `pydantic-settings` (no hardcoded secrets)
 
 **Verification:**
-- [ ] `pytest` (empty/smoke suite) passes
-- [ ] Manual: `curl localhost:8000/health` returns `{"neo4j": "ok"}`
+- [x] `pytest` (1 test, real Neo4j connectivity check) passes
+- [x] Manual: `curl localhost:8000/health` returns `{"neo4j": "ok"}`; `ruff check .` clean
 
 **Dependencies:** Task 1
 
