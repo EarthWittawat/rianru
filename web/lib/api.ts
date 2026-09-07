@@ -45,6 +45,36 @@ export function documentFileUrl(id: string) {
   return `${API_BASE}/documents/${encodeURIComponent(id)}/file`;
 }
 
+export type StudyTask = {
+  id: string;
+  action: string;
+  topic: string;
+  source: { document_title: string; page: number | null } | null;
+  why: string | null;
+  est_minutes: number | null;
+  done: boolean;
+};
+
+export type StudyPlan = { id: string; created_at: string; tasks: StudyTask[] };
+
+export function generatePlan() {
+  return post<StudyPlan>("/coach/plan", {});
+}
+
+export function getLatestPlan() {
+  return get<StudyPlan>("/coach/plan/latest");
+}
+
+export async function setTaskDone(taskId: string, done: boolean) {
+  const response = await fetch(`${API_BASE}/coach/tasks/${taskId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ done }),
+  });
+  if (!response.ok) throw new Error(`failed: ${response.status}`);
+  return response.json();
+}
+
 export type TopicStat = {
   topic: string;
   attempted: number;
