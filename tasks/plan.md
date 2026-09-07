@@ -51,7 +51,7 @@ data it produces.
 - [ ] Review with human before proceeding
 
 ### Phase 3: PDF Viewer + Explain + Highlight
-- [ ] Task 9: Backend `/documents` list + serve endpoints
+- [x] Task 9: Backend `/documents` list + serve endpoints
 - [ ] Task 10: Frontend PDF viewer page (selectable text)
 - [ ] Task 11: Backend `POST /explain`
 - [ ] Task 12: Frontend explain side panel
