@@ -78,17 +78,20 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 
 ## Phase 2: Ingestion Pipeline
 
-### Task 4: PDF/notebook parsing + chunking
+### Task 4: PDF/notebook parsing + chunking ✅
 **Description:** Pure-logic service that takes a file path (PDF or `.ipynb`) and returns a list of text chunks with metadata (source file, page number if PDF, cell index if notebook). No I/O to Neo4j here — this is unit-testable in isolation.
 
 **Acceptance criteria:**
-- [ ] Given a CPE393 lecture PDF, returns non-empty chunks with page numbers
-- [ ] Given a lab `.ipynb`, returns chunks from markdown + code cells with cell index
-- [ ] Chunk size is configurable (default ~500 tokens, with overlap)
+- [x] Given a CPE393 lecture PDF, returns non-empty chunks with page numbers
+- [x] Given a lab `.ipynb`, returns chunks from markdown + code cells with cell index
+- [x] Chunk size is configurable (default 1500 chars, 200 char overlap)
+- [x] `.md` supported too (lab/quiz `description.md` files listed in `manifest.json`)
 
 **Verification:**
-- [ ] `pytest server/tests/test_chunking.py` passes against 2-3 real CPE393 files
-- [ ] Manual: print chunk count/lengths for `L1 - Intro.pdf`
+- [x] `pytest tests/test_chunking.py` — 5 tests against real CPE393 PDF + notebook
+- [x] Manual: `L2 - Pattern Matching.pdf` → 22 chunks over 22 pages, slide bullet structure preserved; `Lab1_regex.ipynb` → 38 chunks across markdown + code cells
+
+**Note:** Windows console is cp1252 — ingest script output must force UTF-8 or it crashes on bullet glyphs (`●`) in slide text.
 
 **Dependencies:** Task 2
 

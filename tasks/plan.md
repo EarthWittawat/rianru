@@ -38,7 +38,7 @@ data it produces.
 - [x] Reviewed — user approved autonomous run of Tasks 3-20
 
 ### Phase 2: Ingestion Pipeline
-- [ ] Task 4: PDF/notebook parsing + chunking (pure logic)
+- [x] Task 4: PDF/notebook parsing + chunking (pure logic)
 - [ ] Task 5: Embedding service + Neo4j Document/Chunk write + vector index
 - [ ] Task 6: vLLM client service + prompt templates
 - [ ] Task 7: Entity/relation extraction → Neo4j Entity nodes
