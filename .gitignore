@@ -26,8 +26,7 @@ server/.cache/
 .DS_Store
 Thumbs.db
 
-# Course material (read-only source, not project code) and local tool config
+# Course material (read-only source, not project code)
 /CPE393 - Text Analytics/
 /CPE401 - Computer Engineering Project I/
 /CPE494 - Cloud Computing and Security/
-.claude/
