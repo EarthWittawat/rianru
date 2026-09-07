@@ -12,5 +12,9 @@ class Settings(BaseSettings):
     neo4j_user: str
     neo4j_password: str
 
+    # Personal progress lives in SQLite, separate from the course knowledge
+    # graph. Relative to the server/ directory the app is launched from.
+    progress_db_path: str = "data/progress.db"
+
 
 settings = Settings()

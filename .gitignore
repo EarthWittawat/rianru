@@ -30,3 +30,6 @@ Thumbs.db
 /CPE393 - Text Analytics/
 /CPE401 - Computer Engineering Project I/
 /CPE494 - Cloud Computing and Security/
+
+# Local progress database
+server/data/

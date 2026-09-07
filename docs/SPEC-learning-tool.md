@@ -32,7 +32,7 @@ CPE494 support, multi-user or auth, mobile.
 |---|---|---|
 | Frontend | Next.js 14 (App Router) + TypeScript + Tailwind CSS | "website," needs a PDF viewer with a text layer + a graph viz — React ecosystem covers both (`react-pdf`/pdf.js, a force-graph library) |
 | Backend | Python 3.11 + FastAPI | PDF/notebook parsing, embeddings, Neo4j driver, and vLLM calls are all easier in Python; serves a REST API to the Next.js app on localhost |
-| Database | Neo4j 5.x (Community, Docker) | Single source of truth for Documents, Chunks, Entities, Highlights, QuizQuestions — graph *and* vector index (native vector index, Community-edition-capable since 5.11+), so no second datastore |
+| Database | Neo4j 5.x (Community, Docker) for course knowledge; SQLite for personal progress | Neo4j holds Documents, Chunks, Entities, Highlights and QuizQuestions — graph *and* vector index in one place. Personal progress (quiz attempts, scores, timestamps) is tabular time-series data and lives in a separate local SQLite file — see Resolved Decisions |
 | Embeddings | `sentence-transformers` (local, e.g. `all-MiniLM-L6-v2`), single dense vector/chunk | vLLM gateway is chat-only; dense embeddings fit Neo4j's native vector index directly, no GPU needed. ColBERT (text late-interaction) / ColQwen (ColPali-style vision-language, page-as-image) considered and explicitly deferred — no local GPU, and both need multi-vector storage outside Neo4j (RAGatouille/PLAID or similar), which breaks "Neo4j = single source of truth." Documented as a future upgrade path once GPU is available, not MVP scope. |
 | LLM | Existing vLLM gateway (`VLLM_URL`, `VLLM_MODEL`, `VLLM_API_KEY` in `D:\leb2\.env`) | Already provisioned — reused for explanations, chat tutor, entity/relation extraction, and quiz generation, all via prompted chat completions |
 | PDF rendering | `pdf.js` / `react-pdf` | Text layer needed for click-to-select and highlight overlays |
@@ -186,6 +186,19 @@ Personal tool, single user — pragmatic bar, not exhaustive coverage:
 
 ## Resolved Decisions
 
+- **Progress storage — SQLite alongside Neo4j (2026-09-08):** this spec
+  originally recorded "Neo4j is the only datastore". That no longer holds.
+  Quiz attempts, scores and timestamps are tabular time-series data that the
+  study coach queries repeatedly; keeping them out of the course-knowledge
+  graph keeps both stores clean and avoids mixing personal history into
+  shared course structure. Progress lives at `server/data/progress.db`
+  (gitignored). Neo4j remains the single source of truth for everything about
+  the *course material* itself. See `docs/intent/study-coach-agents.md`.
+- **GPU available (2026-09-08):** the machine has an RTX 5070 Ti (Blackwell,
+  sm_120) running CUDA 12.8 torch, so embeddings run on GPU. This invalidates
+  the "no local GPU" premise the ColBERT/ColQwen deferral below rests on —
+  that decision is now open to revisit on quality grounds rather than closed
+  on hardware grounds.
 - **Embeddings — dense vs. ColBERT/ColQwen (2026-09-07):** dense
   `sentence-transformers` for MVP. No local GPU; ColBERT/ColQwen both need
   multi-vector storage outside Neo4j. Revisit as a post-MVP upgrade if
