@@ -8,3 +8,11 @@ ruff==0.8.6
 pdfplumber==0.11.10
 nbformat==5.11.1
 sentence-transformers==6.0.1
+
+# torch arrives via sentence-transformers, but plain PyPI serves a CPU-only
+# build. This machine has an RTX 5070 Ti (Blackwell, sm_120), which needs a
+# CUDA 12.8 build — older cu121 wheels have no sm_120 kernels:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+# sentence-transformers then picks up the GPU on its own.
+# Stop any process importing torch before reinstalling; on Windows a running
+# server holds torch/_C.pyd open and the uninstall half-fails.
