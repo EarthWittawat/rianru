@@ -91,6 +91,36 @@ def write_document(
     return len(rows)
 
 
+def write_entities(
+    chunk_id: str, entities: list[dict], relations: list[dict]
+) -> None:
+    if not entities:
+        return
+
+    with get_driver().session() as session:
+        session.run(
+            """
+            MATCH (c:Chunk {id: $chunk_id})
+            UNWIND $entities AS entity
+            MERGE (e:Entity {name: entity.name})
+              ON CREATE SET e.type = entity.type
+            MERGE (c)-[:MENTIONS]->(e)
+            """,
+            chunk_id=chunk_id,
+            entities=entities,
+        )
+        if relations:
+            session.run(
+                """
+                UNWIND $relations AS rel
+                MATCH (source:Entity {name: rel.source})
+                MATCH (target:Entity {name: rel.target})
+                MERGE (source)-[r:RELATES_TO {type: rel.type}]->(target)
+                """,
+                relations=relations,
+            )
+
+
 def similarity_search(query: str, top_k: int = 6) -> list[dict]:
     query_embedding = embed_text(query)
     with get_driver().session() as session:

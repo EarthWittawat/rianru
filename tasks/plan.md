@@ -41,7 +41,7 @@ data it produces.
 - [x] Task 4: PDF/notebook parsing + chunking (pure logic)
 - [x] Task 5: Embedding service + Neo4j Document/Chunk write + vector index
 - [x] Task 6: vLLM client service + prompt templates
-- [ ] Task 7: Entity/relation extraction → Neo4j Entity nodes
+- [x] Task 7: Entity/relation extraction → Neo4j Entity nodes
 - [ ] Task 8: `scripts/ingest.py` CLI wiring, run against CPE393
 
 ### Checkpoint: Ingestion
