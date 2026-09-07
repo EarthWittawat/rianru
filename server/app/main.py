@@ -1,12 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import chat, documents, explain, graph, highlights, progress, quiz
+from app.routers import (
+    chat,
+    coach,
+    documents,
+    explain,
+    graph,
+    highlights,
+    progress,
+    quiz,
+)
 from app.services.neo4j_client import check_connectivity
 from app.services.progress import init_db
+from app.services.study_plan import init_db as init_study_plan_db
 
 app = FastAPI(title="Learning Tool API")
 init_db()
+init_study_plan_db()
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,6 +34,7 @@ app.include_router(graph.router)
 app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(progress.router)
+app.include_router(coach.router)
 
 
 @app.get("/health")
