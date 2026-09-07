@@ -27,7 +27,7 @@ data it produces.
 ## Task List
 
 ### Phase 1: Foundation
-- [ ] Task 1: Neo4j via Docker Compose
+- [x] Task 1: Neo4j via Docker Compose
 - [ ] Task 2: FastAPI backend skeleton + Neo4j connection
 - [ ] Task 3: Next.js frontend skeleton
 

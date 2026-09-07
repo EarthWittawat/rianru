@@ -6,17 +6,17 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 
 ## Phase 1: Foundation
 
-### Task 1: Neo4j via Docker Compose
+### Task 1: Neo4j via Docker Compose ✅
 **Description:** Add a `docker-compose.yml` at repo root defining a `neo4j:5.15` (or later) Community service with Bolt (7687) and HTTP (7474) ports exposed, a named volume for data, and auth credentials read from `.env`.
 
 **Acceptance criteria:**
-- [ ] `docker compose up -d neo4j` starts a healthy container
-- [ ] Neo4j Browser reachable at `http://localhost:7474`
-- [ ] Vector index syntax (`CREATE VECTOR INDEX ...`) succeeds against a scratch node
+- [x] `docker compose up -d neo4j` starts a healthy container
+- [x] Neo4j Browser reachable at `http://localhost:7474`
+- [x] Vector index syntax (`CREATE VECTOR INDEX ...`) succeeds against a scratch node
 
 **Verification:**
-- [ ] Manual: `docker compose ps` shows `neo4j` healthy
-- [ ] Manual: run `CALL db.index.vector.createNodeIndex(...)` in Neo4j Browser without error
+- [x] Manual: `docker compose ps` shows `neo4j` healthy
+- [x] Manual: ran `CREATE VECTOR INDEX ... FOR (n:ScratchTest) ON (n.embedding)` via cypher-shell — index reached `POPULATING`/would go `ONLINE`; scratch node + index cleaned up after
 
 **Dependencies:** None
 
