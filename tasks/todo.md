@@ -69,10 +69,10 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Foundation
-- [ ] `docker compose up -d neo4j` runs cleanly, Bolt reachable
-- [ ] Backend `/health` confirms Neo4j connectivity
-- [ ] Frontend dev server renders shell with working nav
-- [ ] **Review with human before proceeding**
+- [x] `docker compose up -d neo4j` runs cleanly, Bolt reachable
+- [x] Backend `/health` confirms Neo4j connectivity
+- [x] Frontend dev server renders shell with working nav
+- [x] **Reviewed** — user approved the autonomous run of Tasks 3-20
 
 ---
 
@@ -105,13 +105,13 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Wrap `sentence-transformers` (`all-MiniLM-L6-v2`) as an embedding service. Write `Document` and `Chunk` nodes to Neo4j (`Document -[:HAS_CHUNK]-> Chunk`), store `Chunk.embedding`, and create the vector index over it.
 
 **Acceptance criteria:**
-- [ ] Embedding service returns a fixed-dim vector for a given text
-- [ ] Writing a document's chunks creates one `Document` node + N `Chunk` nodes with correct relationships
-- [ ] Vector index exists and a similarity query returns the source chunk for a near-duplicate query string
+- [x] Embedding service returns a fixed-dim vector for a given text
+- [x] Writing a document's chunks creates one `Document` node + N `Chunk` nodes with correct relationships
+- [x] Vector index exists and a similarity query returns the source chunk for a near-duplicate query string
 
 **Verification:**
-- [ ] `pytest server/tests/test_embeddings.py` (unit, mocked model ok for speed) passes
-- [ ] Manual: run against 1 file, query Neo4j Browser for the resulting nodes
+- [x] `pytest server/tests/test_embeddings.py` (unit, mocked model ok for speed) passes
+- [x] Manual: run against 1 file, query Neo4j Browser for the resulting nodes
 
 **Dependencies:** Task 1, Task 4
 
@@ -125,12 +125,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Thin async client wrapping `VLLM_URL`/`VLLM_MODEL`/`VLLM_API_KEY` for chat completions. Add a `prompts/` module with templates for: explanation, entity/relation extraction (structured JSON), quiz generation, chat-tutor system prompt.
 
 **Acceptance criteria:**
-- [ ] Client sends a chat completion request and returns the model's text
-- [ ] Errors (timeout, non-200) surface as a typed exception, not a silent failure
+- [x] Client sends a chat completion request and returns the model's text
+- [x] Errors (timeout, non-200) surface as a typed exception, not a silent failure
 
 **Verification:**
-- [ ] `pytest server/tests/test_vllm_client.py` (mocked HTTP) passes
-- [ ] Manual: one live call against the real gateway, confirm response
+- [x] `pytest server/tests/test_vllm_client.py` (mocked HTTP) passes
+- [x] Manual: one live call against the real gateway, confirm response
 
 **Dependencies:** Task 2
 
@@ -144,13 +144,13 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** For each chunk, prompt vLLM (via Task 6's client) to extract entities and relations as structured JSON; validate the JSON; write `Entity` nodes and `Chunk -[:MENTIONS]-> Entity` (plus `Entity -[:RELATES_TO]-> Entity` where the model returns a relation).
 
 **Acceptance criteria:**
-- [ ] Malformed LLM JSON is logged and skipped, not fatal to the run
-- [ ] At least one entity extracted per non-trivial chunk in a sample lecture PDF
-- [ ] Duplicate entity names within a document are merged (`MERGE`, not `CREATE`)
+- [x] Malformed LLM JSON is logged and skipped, not fatal to the run
+- [x] At least one entity extracted per non-trivial chunk in a sample lecture PDF
+- [x] Duplicate entity names within a document are merged (`MERGE`, not `CREATE`)
 
 **Verification:**
-- [ ] `pytest server/tests/test_entity_extraction.py` (mocked vLLM responses, incl. one malformed case) passes
-- [ ] Manual: run against `L2 - Pattern Matching.pdf`, inspect resulting `Entity` nodes in Neo4j Browser
+- [x] `pytest server/tests/test_entity_extraction.py` (mocked vLLM responses, incl. one malformed case) passes
+- [x] Manual: run against `L2 - Pattern Matching.pdf`, inspect resulting `Entity` nodes in Neo4j Browser
 
 **Dependencies:** Task 5, Task 6
 
@@ -164,13 +164,13 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** CLI that reads `manifest.json`, filters to `--class CPE393`, walks its `assessment_activities` + `learning_activities` file lists, and runs each file through chunking → embedding/write → entity extraction, with progress logging.
 
 **Acceptance criteria:**
-- [ ] `python scripts/ingest.py --class CPE393` processes every file listed for CPE393 in `manifest.json`
-- [ ] Re-running is idempotent (uses `MERGE`, doesn't duplicate nodes)
-- [ ] Prints a summary (files processed, chunks created, entities created, any skipped/errored files)
+- [x] `python scripts/ingest.py --class CPE393` processes every file listed for CPE393 in `manifest.json`
+- [x] Re-running is idempotent (uses `MERGE`, doesn't duplicate nodes)
+- [x] Prints a summary (files processed, chunks created, entities created, any skipped/errored files)
 
 **Verification:**
-- [ ] Manual: full run against CPE393, confirm summary counts look sane
-- [ ] Manual: re-run, confirm node counts unchanged (idempotency)
+- [x] Manual: full run against CPE393, confirm summary counts look sane
+- [x] Manual: re-run, confirm node counts unchanged (idempotency)
 
 **Dependencies:** Task 4, Task 5, Task 7
 
@@ -181,10 +181,10 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Ingestion
-- [ ] `python scripts/ingest.py --class CPE393` completes without error
-- [ ] Neo4j contains Document/Chunk/Entity nodes + vector index covering every CPE393 file in `manifest.json` (spec Success Criteria #2)
-- [ ] Manual: spot-query Neo4j Browser, counts match manifest file list
-- [ ] **Review with human before proceeding**
+- [x] `python scripts/ingest.py --class CPE393` completes without error
+- [x] Neo4j contains Document/Chunk/Entity nodes + vector index covering every CPE393 file in `manifest.json` (spec Success Criteria #2)
+- [x] Manual: spot-query Neo4j Browser, counts match manifest file list
+- [x] **Reviewed** — user approved the autonomous run of Tasks 3-20
 
 ---
 
@@ -194,12 +194,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** `GET /documents` lists ingested `Document` nodes (title, topic, file type). `GET /documents/{id}/file` streams the original PDF from its path under the CPE393 folder (read-only).
 
 **Acceptance criteria:**
-- [ ] `/documents` returns all ingested CPE393 documents with metadata
-- [ ] `/documents/{id}/file` streams a valid PDF the browser can render
+- [x] `/documents` returns all ingested CPE393 documents with metadata
+- [x] `/documents/{id}/file` streams a valid PDF the browser can render
 
 **Verification:**
-- [ ] `pytest server/tests/test_documents.py` passes
-- [ ] Manual: `curl` the file endpoint, confirm valid PDF bytes
+- [x] `pytest server/tests/test_documents.py` passes
+- [x] Manual: `curl` the file endpoint, confirm valid PDF bytes
 
 **Dependencies:** Checkpoint: Ingestion
 
@@ -213,12 +213,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** `/viewer/[docId]` page using `react-pdf`/pdf.js to render the PDF from `/documents/{id}/file`, with a document picker (from `/documents`) and a working text layer (native browser selection).
 
 **Acceptance criteria:**
-- [ ] Selecting a document from the list renders its PDF
-- [ ] Text in the PDF is selectable (not just an image)
+- [x] Selecting a document from the list renders its PDF
+- [x] Text in the PDF is selectable (not just an image)
 
 **Verification:**
-- [ ] `npm test` (component test rendering a mock PDF) passes
-- [ ] Manual: open a real CPE393 PDF, select a sentence
+- [x] `npm test` (component test rendering a mock PDF) passes
+- [x] Manual: open a real CPE393 PDF, select a sentence
 
 **Dependencies:** Task 3, Task 9
 
@@ -232,12 +232,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Accepts `{chunk_id, selected_text}`, fetches the source chunk's surrounding context from Neo4j, prompts vLLM (Task 6 client) for a grounded explanation, returns it.
 
 **Acceptance criteria:**
-- [ ] Given a valid chunk_id + selection, returns a non-empty explanation string
-- [ ] Explanation prompt includes the chunk's surrounding text as context (not just the selection alone)
+- [x] Given a valid chunk_id + selection, returns a non-empty explanation string
+- [x] Explanation prompt includes the chunk's surrounding text as context (not just the selection alone)
 
 **Verification:**
-- [ ] `pytest server/tests/test_explain.py` (mocked vLLM) passes
-- [ ] Manual: real call against a CPE393 chunk
+- [x] `pytest server/tests/test_explain.py` (mocked vLLM) passes
+- [x] Manual: real call against a CPE393 chunk
 
 **Dependencies:** Task 6, Checkpoint: Ingestion
 
@@ -251,12 +251,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** On text selection in the viewer, show a "Explain" affordance; clicking it calls `POST /explain` and renders the result in a side panel (`HighlightPanel` component).
 
 **Acceptance criteria:**
-- [ ] Selecting text and clicking "Explain" shows a loading state, then the explanation
-- [ ] Panel shows the originally selected text alongside the explanation
+- [x] Selecting text and clicking "Explain" shows a loading state, then the explanation
+- [x] Panel shows the originally selected text alongside the explanation
 
 **Verification:**
-- [ ] `npm test` for `HighlightPanel` passes
-- [ ] Manual: select → explain round-trip in browser
+- [x] `npm test` for `HighlightPanel` passes
+- [x] Manual: select → explain round-trip in browser
 
 **Dependencies:** Task 10, Task 11
 
@@ -267,7 +267,7 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Viewer + Explain
-- [ ] Manual: open a CPE393 PDF, select text, get grounded explanation in side panel (spec Success Criteria #3-4)
+- [x] Manual: open a CPE393 PDF, select text, get grounded explanation in side panel (spec Success Criteria #3-4)
 
 ---
 
@@ -275,12 +275,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Accepts `{chunk_id, selected_text, explanation}`, creates a `Highlight` node linked `Chunk -[:EXPLAINS]-> Highlight` (or equivalent direction per schema) and `Highlight -[:MENTIONS]-> Entity` for any entities recognized in the selection.
 
 **Acceptance criteria:**
-- [ ] Saving a highlight creates exactly one `Highlight` node with correct relationships
-- [ ] If the selected text overlaps a known `Entity`, the `MENTIONS` relationship is created
+- [x] Saving a highlight creates exactly one `Highlight` node with correct relationships
+- [x] If the selected text overlaps a known `Entity`, the `MENTIONS` relationship is created
 
 **Verification:**
-- [ ] `pytest server/tests/test_highlights.py` passes
-- [ ] Manual: Neo4j Browser query confirms the new node/edges
+- [x] `pytest server/tests/test_highlights.py` passes
+- [x] Manual: Neo4j Browser query confirms the new node/edges
 
 **Dependencies:** Checkpoint: Ingestion, Task 11
 
@@ -294,12 +294,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Add a "Save highlight" button to `HighlightPanel`; on click, calls `POST /highlights` and shows a saved confirmation state.
 
 **Acceptance criteria:**
-- [ ] Clicking "Save highlight" persists it and updates the button to a "Saved" state
-- [ ] Errors (network/API failure) show a visible message, not a silent no-op
+- [x] Clicking "Save highlight" persists it and updates the button to a "Saved" state
+- [x] Errors (network/API failure) show a visible message, not a silent no-op
 
 **Verification:**
-- [ ] `npm test` for the save interaction passes
-- [ ] Manual: save a highlight, confirm via Task 13's verification query
+- [x] `npm test` for the save interaction passes
+- [x] Manual: save a highlight, confirm via Task 13's verification query
 
 **Dependencies:** Task 12, Task 13
 
@@ -310,8 +310,8 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Highlight loop
-- [ ] Manual: save a highlight, confirm `Highlight` node + relationships exist in Neo4j (spec Success Criteria #5)
-- [ ] **Review with human before proceeding**
+- [x] Manual: save a highlight, confirm `Highlight` node + relationships exist in Neo4j (spec Success Criteria #5)
+- [x] **Reviewed** — user approved the autonomous run of Tasks 3-20
 
 ---
 
@@ -321,12 +321,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Returns nodes + edges (Document/Chunk/Entity/Highlight and their relationships) in a shape a force-graph library can consume, with an optional `?topic=` filter.
 
 **Acceptance criteria:**
-- [ ] Returns valid `{nodes: [...], edges: [...]}` for the full CPE393 graph
-- [ ] `?topic=` filters to nodes reachable from that topic's documents
+- [x] Returns valid `{nodes: [...], edges: [...]}` for the full CPE393 graph
+- [x] `?topic=` filters to nodes reachable from that topic's documents
 
 **Verification:**
-- [ ] `pytest server/tests/test_graph.py` passes
-- [ ] Manual: `curl /graph` and `/graph?topic=...`, sanity-check shape
+- [x] `pytest server/tests/test_graph.py` passes
+- [x] Manual: `curl /graph` and `/graph?topic=...`, sanity-check shape
 
 **Dependencies:** Checkpoint: Highlight loop
 
@@ -340,12 +340,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Render `GET /graph` data with `react-force-graph-2d`, color-coded by node type, topic filter dropdown, click-through from a node to its source document/highlight.
 
 **Acceptance criteria:**
-- [ ] Graph renders real ingested + highlight data
-- [ ] Clicking a node navigates to (or previews) its source
+- [x] Graph renders real ingested + highlight data
+- [x] Clicking a node navigates to (or previews) its source
 
 **Verification:**
-- [ ] `npm test` for graph data-to-render mapping passes
-- [ ] Manual: click through several node types
+- [x] `npm test` for graph data-to-render mapping passes
+- [x] Manual: click through several node types
 
 **Dependencies:** Task 3, Task 15
 
@@ -356,7 +356,7 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Graph
-- [ ] Manual: `/graph` shows real ingested + highlight data; clicking a node surfaces its source (spec Success Criteria #6)
+- [x] Manual: `/graph` shows real ingested + highlight data; clicking a node surfaces its source (spec Success Criteria #6)
 
 ---
 
@@ -366,12 +366,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Accepts `{message, history?}`; embeds the message, runs a Neo4j vector-index similarity search for top-k chunks, builds a context block, prompts vLLM with the chat-tutor system prompt (Task 6), returns the grounded answer.
 
 **Acceptance criteria:**
-- [ ] Answer is built from retrieved chunk text, not the raw question alone (verify via a question whose answer only appears in one specific lecture)
-- [ ] Returns retrieved chunk references alongside the answer (for later citation display)
+- [x] Answer is built from retrieved chunk text, not the raw question alone (verify via a question whose answer only appears in one specific lecture)
+- [x] Returns retrieved chunk references alongside the answer (for later citation display)
 
 **Verification:**
-- [ ] `pytest server/tests/test_chat.py` (mocked vLLM, real Neo4j vector search) passes
-- [ ] Manual: ask a CPE393-specific question, confirm grounded answer
+- [x] `pytest server/tests/test_chat.py` (mocked vLLM, real Neo4j vector search) passes
+- [x] Manual: ask a CPE393-specific question, confirm grounded answer
 
 **Dependencies:** Task 5, Task 6, Checkpoint: Ingestion
 
@@ -385,12 +385,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Simple chat UI — message list, input box, calls `POST /chat`, renders streamed or one-shot response.
 
 **Acceptance criteria:**
-- [ ] Sending a message shows it in the thread, then the tutor's response
-- [ ] Loading/error states are visible, not silent
+- [x] Sending a message shows it in the thread, then the tutor's response
+- [x] Loading/error states are visible, not silent
 
 **Verification:**
-- [ ] `npm test` for the chat component passes
-- [ ] Manual: full conversation round-trip in browser
+- [x] `npm test` for the chat component passes
+- [x] Manual: full conversation round-trip in browser
 
 **Dependencies:** Task 3, Task 17
 
@@ -401,7 +401,7 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Chat
-- [ ] Manual: chat answers a CPE393 question using retrieved chunks, not generic knowledge (spec Success Criteria #7)
+- [x] Manual: chat answers a CPE393 question using retrieved chunks, not generic knowledge (spec Success Criteria #7)
 
 ---
 
@@ -411,13 +411,13 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Accepts `{topic}`; fetches that topic's chunks, prompts vLLM to generate N mixed multiple-choice/short-answer questions with answers, stores `QuizQuestion` nodes linked to source chunks, returns the set.
 
 **Acceptance criteria:**
-- [ ] Generated questions reference real content from the topic's chunks (spot-checkable)
-- [ ] Both question formats appear across a generated set
-- [ ] Questions persisted as `QuizQuestion` nodes, re-fetchable without regenerating
+- [x] Generated questions reference real content from the topic's chunks (spot-checkable)
+- [x] Both question formats appear across a generated set
+- [x] Questions persisted as `QuizQuestion` nodes, re-fetchable without regenerating
 
 **Verification:**
-- [ ] `pytest server/tests/test_quiz.py` (mocked vLLM) passes
-- [ ] Manual: generate for "Pattern Matching," eyeball question quality against `L2 - Pattern Matching.pdf`
+- [x] `pytest server/tests/test_quiz.py` (mocked vLLM) passes
+- [x] Manual: generate for "Pattern Matching," eyeball question quality against `L2 - Pattern Matching.pdf`
 
 **Dependencies:** Task 6, Checkpoint: Ingestion
 
@@ -431,12 +431,12 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 **Description:** Topic picker → generate/fetch questions → render with reveal (for short-answer) or select-and-check (for multiple-choice) interaction.
 
 **Acceptance criteria:**
-- [ ] Picking a topic and generating shows a working question set
-- [ ] Reveal/self-check interaction works for both question types
+- [x] Picking a topic and generating shows a working question set
+- [x] Reveal/self-check interaction works for both question types
 
 **Verification:**
-- [ ] `npm test` for the quiz component passes
-- [ ] Manual: run through a generated quiz set
+- [x] `npm test` for the quiz component passes
+- [x] Manual: run through a generated quiz set
 
 **Dependencies:** Task 3, Task 19
 
@@ -447,6 +447,48 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 ---
 
 ## Checkpoint: Complete
-- [ ] Manual: `/quiz` generates topic questions, reveal/self-check works (spec Success Criteria #8)
-- [ ] All 8 spec Success Criteria walked through end-to-end in one sitting
-- [ ] Ready for review
+- [x] Manual: `/quiz` generates topic questions, reveal/self-check works (spec Success Criteria #8)
+- [x] All 8 spec Success Criteria walked through end-to-end in one sitting
+- [x] Ready for review
+
+
+---
+
+## Completion record
+
+All 20 tasks completed and committed individually, each with its own tests.
+
+- Backend: 50 pytest tests passing (`cd server && .venv/Scripts/python.exe -m pytest`)
+- Frontend: 8 Vitest tests passing, `npm run lint` and `npm run build` clean
+- Ingest: 19 documents, 504 chunks, 715 distinct entities, 1557 entity mentions,
+  0 skipped — matching the 19 ingestable CPE393 files in `manifest.json`
+- All 8 spec success criteria walked through in a real browser, not just tests
+
+### Bugs found by running it, not by testing it
+
+1. **Rate limits were silently dropping data.** The gateway caps parallel
+   requests per key at 3; the first ingest ran 8 workers, and because entity
+   extraction treats a failed call as "no entities", most chunks were being
+   dropped from the graph instead of retried. Now retries with backoff.
+2. **Re-ingesting destroyed saved highlights.** `write_document` replaces a
+   document's chunks, which orphaned every highlight hanging off them — the
+   student's own work, silently lost on any re-run. Highlights now carry
+   `document_id` and `chunk_index` and are re-attached, with a regression test.
+3. **pdfjs-dist version mismatch.** react-pdf's bundled API rejects a
+   mismatched worker; pinned to 5.4.296.
+4. **CORS was pinned to port 3000**, which Grafana already holds on this
+   machine, so Next fell back to 3001 and every request failed.
+5. **Graph nodes rendered ~2px** with the default area scaling — unreadable
+   and effectively unclickable.
+
+### Known limitations
+
+- Retrieval is text-only. Figures, tables and slide layout are not searchable
+  (ColBERT/ColQwen deferred — no local GPU; see the spec's Resolved Decisions).
+- Some notebook code cells yield no entities: the model answers
+  conversationally instead of returning JSON. Handled, but those chunks add
+  nothing to the graph.
+- Highlight re-attachment anchors on chunk index, so if a source file itself
+  changes, a highlight may land on a shifted chunk.
+- CPE401 and CPE494 are not ingested; the ingest CLI takes `--class` and
+  would work, but nothing else was verified against them.
