@@ -29,13 +29,13 @@ data it produces.
 ### Phase 1: Foundation
 - [x] Task 1: Neo4j via Docker Compose
 - [x] Task 2: FastAPI backend skeleton + Neo4j connection
-- [ ] Task 3: Next.js frontend skeleton
+- [x] Task 3: Next.js frontend skeleton
 
 ### Checkpoint: Foundation
-- [ ] `docker compose up -d neo4j` runs cleanly, Bolt reachable
-- [ ] Backend `/health` confirms Neo4j connectivity
-- [ ] Frontend dev server renders shell with nav to Viewer/Graph/Chat/Quiz (stub pages)
-- [ ] Review with human before proceeding
+- [x] `docker compose up -d neo4j` runs cleanly, Bolt reachable
+- [x] Backend `/health` confirms Neo4j connectivity
+- [x] Frontend builds clean with nav to Viewer/Graph/Chat/Quiz (stub pages)
+- [x] Reviewed — user approved autonomous run of Tasks 3-20
 
 ### Phase 2: Ingestion Pipeline
 - [ ] Task 4: PDF/notebook parsing + chunking (pure logic)

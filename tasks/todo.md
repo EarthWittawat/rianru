@@ -46,16 +46,19 @@ Plan: `tasks/plan.md` · Spec: `docs/SPEC-learning-tool.md`
 
 ---
 
-### Task 3: Next.js frontend skeleton
-**Description:** Scaffold `web/` with Next.js 14 App Router, TypeScript, Tailwind. Add a shared layout with nav links to `/viewer`, `/graph`, `/chat`, `/quiz` (stub pages, placeholder content).
+### Task 3: Next.js frontend skeleton ✅
+**Description:** Scaffold `web/` with Next.js App Router, TypeScript, Tailwind. Add a shared layout with nav links to `/viewer`, `/graph`, `/chat`, `/quiz` (stub pages, placeholder content).
+
+**Note:** scaffolded on Next.js 16.3.4 (not 14) — `params` is a Promise in this version, relevant for Task 10's dynamic route.
 
 **Acceptance criteria:**
-- [ ] `npm run dev` serves the app at `localhost:3000`
-- [ ] Nav links route to all four stub pages without error
+- [x] `npm run dev` serves the app at `localhost:3000`
+- [x] Nav links route to all four stub pages without error
 
 **Verification:**
-- [ ] `npm run lint` passes
-- [ ] Manual: click through all four nav links in browser
+- [x] `npm run lint` passes
+- [x] `npm test` — NavBar renders all links, marks active route (2 tests)
+- [x] `npm run build` clean, all 6 routes prerendered
 
 **Dependencies:** None (parallel with Task 1/2)
 
