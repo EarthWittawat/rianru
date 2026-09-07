@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+
+# Python
+server/.venv/
+server/__pycache__/
+server/**/__pycache__/
+server/.pytest_cache/
+*.pyc
+
+# Neo4j local data (Docker volume)
+neo4j-data/
+neo4j-logs/
+
+# Local models cache
+server/.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Course material (read-only source, not project code) and local tool config
+/CPE393 - Text Analytics/
+/CPE401 - Computer Engineering Project I/
+/CPE494 - Cloud Computing and Security/
+.claude/
