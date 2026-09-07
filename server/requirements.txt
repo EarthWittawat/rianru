@@ -16,3 +16,5 @@ sentence-transformers==6.0.1
 # sentence-transformers then picks up the GPU on its own.
 # Stop any process importing torch before reinstalling; on Windows a running
 # server holds torch/_C.pyd open and the uninstall half-fails.
+langchain==1.4.0
+langchain-openai==1.6.0
