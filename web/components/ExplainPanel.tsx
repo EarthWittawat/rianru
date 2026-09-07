@@ -8,6 +8,7 @@ import {
   type Explanation,
 } from "@/lib/api";
 import type { Selection } from "@/components/PdfPane";
+import { Markdown } from "@/components/Markdown";
 
 type Status = "idle" | "loading" | "ready" | "error";
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -104,9 +105,7 @@ export function ExplainPanel({ document, selection, onClear }: Props) {
 
         {status === "ready" && result && (
           <div className="mt-6">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-800">
-              {result.explanation}
-            </p>
+            <Markdown>{result.explanation}</Markdown>
             <p className="mt-3 text-xs text-neutral-500">
               From {result.topic}
               {result.page ? ` · page ${result.page}` : ""}

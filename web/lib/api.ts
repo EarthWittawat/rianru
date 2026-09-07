@@ -44,6 +44,24 @@ export function documentFileUrl(id: string) {
   return `${API_BASE}/documents/${encodeURIComponent(id)}/file`;
 }
 
+export type ChatSource = {
+  chunk_id: string;
+  document_id: string;
+  document_title: string;
+  topic: string;
+  page: number | null;
+  score: number;
+};
+
+export type ChatTurn = { role: "user" | "assistant"; content: string };
+
+export function askTutor(message: string, history: ChatTurn[]) {
+  return post<{ answer: string; sources: ChatSource[] }>("/chat", {
+    message,
+    history,
+  });
+}
+
 export type GraphNode = {
   id: string;
   label: string;

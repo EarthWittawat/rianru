@@ -74,8 +74,8 @@ data it produces.
 - [ ] Manual: `/graph` shows real ingested + highlight data; clicking a node surfaces its source (spec Success Criteria #6)
 
 ### Phase 5: Chat Tutor (RAG)
-- [ ] Task 17: Backend `POST /chat` (embed → vector search → context → vLLM)
-- [ ] Task 18: Frontend `/chat` page
+- [x] Task 17: Backend `POST /chat` (embed → vector search → context → vLLM)
+- [x] Task 18: Frontend `/chat` page
 
 ### Checkpoint: Chat
 - [ ] Manual: chat answers a CPE393 question using retrieved chunks, not generic knowledge (spec Success Criteria #7)
