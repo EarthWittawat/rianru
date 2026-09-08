@@ -17,11 +17,21 @@ from pathlib import Path
 
 import numpy as np
 
-from app.services.multivector import load_index, rank, save_index
+from app.config import settings
+from app.services.multivector import index_model, load_index, rank, save_index
 
 logger = logging.getLogger(__name__)
 
-MODEL_NAME = "vidore/colqwen2-v1.0"
+# Each checkpoint family needs its own model and processor classes, so the
+# choice of checkpoint is not free-form: this is the set that is wired up.
+MODEL_CLASSES = {
+    "vidore/colSmol-256M": ("ColIdefics3", "ColIdefics3Processor"),
+    "vidore/colSmol-500M": ("ColIdefics3", "ColIdefics3Processor"),
+    "vidore/colqwen2-v0.1": ("ColQwen2", "ColQwen2Processor"),
+    "vidore/colqwen2-v1.0": ("ColQwen2", "ColQwen2Processor"),
+}
+
+MODEL_NAME = settings.colpali_model
 INDEX_DIR = Path(__file__).resolve().parents[2] / "data" / "colpali"
 
 # 2x the PDF's own size: enough for slide text to survive rasterising, small
@@ -66,17 +76,26 @@ def render_pdf(path: Path, scale: float = RENDER_SCALE):
 
 @lru_cache(maxsize=1)
 def get_model():
+    import colpali_engine.models as models  # noqa: PLC0415
     import torch  # noqa: PLC0415
-    from colpali_engine.models import ColQwen2, ColQwen2Processor  # noqa: PLC0415
+
+    if MODEL_NAME not in MODEL_CLASSES:
+        raise ValueError(
+            f"Unsupported colpali_model {MODEL_NAME!r}. "
+            f"Wired up: {', '.join(sorted(MODEL_CLASSES))}."
+        )
+    model_class, processor_class = (
+        getattr(models, name) for name in MODEL_CLASSES[MODEL_NAME]
+    )
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    logger.info("Loading ColPali on %s", device)
-    model = ColQwen2.from_pretrained(
+    logger.info("Loading %s on %s", MODEL_NAME, device)
+    model = model_class.from_pretrained(
         MODEL_NAME,
         torch_dtype=torch.bfloat16 if device.startswith("cuda") else torch.float32,
         device_map=device,
     ).eval()
-    return model, ColQwen2Processor.from_pretrained(MODEL_NAME)
+    return model, processor_class.from_pretrained(MODEL_NAME)
 
 
 def encode_pages(images: list) -> list[np.ndarray]:
@@ -101,7 +120,19 @@ def encode_query(text: str) -> np.ndarray:
 
 @lru_cache(maxsize=4)
 def cached_index(course: str) -> tuple[tuple[str, ...], tuple[np.ndarray, ...]]:
-    index = load_index(index_path(course))
+    path = index_path(course)
+    built_by = index_model(path)
+    if built_by is not None and built_by != MODEL_NAME:
+        # Ranking one model's queries against another's pages produces confident
+        # nonsense, which is worse than saying there is no index.
+        logger.warning(
+            "%s was built with %s but %s is configured; rebuild it.",
+            path.name,
+            built_by,
+            MODEL_NAME,
+        )
+        return (), ()
+    index = load_index(path)
     return tuple(index.keys()), tuple(index.values())
 
 

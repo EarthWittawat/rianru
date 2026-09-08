@@ -231,6 +231,13 @@ Personal tool, single user — pragmatic bar, not exhaustive coverage:
   `server/data/colpali/`, one compressed float16 file per course, 6 MB and
   27 MB respectively for CPE393.
 
+  ColPali runs ColSmol-500M by default, not the strongest checkpoint available.
+  colqwen2-v1.0 scores 89.3 on ViDoRe against ColSmol-500M's 82.3, but on this
+  course they return the same pages for the same queries, and the difference
+  that does show is 4.5 GB of VRAM against 0.96 GB. The machine running this is
+  also rendering PDFs in a browser, and a retrieval model that starves the GPU
+  makes the app worse rather than better. `colpali_model` switches it.
+
   ColPali answers with a place rather than a passage. The gateway serves a text
   model, so a page image has nowhere to go; what visual search returns is the
   document and page to open, which is what "find the slide with the chart"

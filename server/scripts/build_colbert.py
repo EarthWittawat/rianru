@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.stdout.reconfigure(encoding="utf-8")
 
 from app.services.colbert_index import (  # noqa: E402
+    MODEL_NAME,
     encode_documents,
     index_path,
     save_index,
@@ -54,7 +55,7 @@ def main() -> int:
         print(f"  {min(start + BATCH, len(rows))}/{len(rows)}")
 
     path = index_path(args.course)
-    save_index(path, documents)
+    save_index(path, documents, model=MODEL_NAME)
     size = path.stat().st_size / 1e6
     tokens = sum(v.shape[0] for v in documents.values())
     print(f"Wrote {path.name}: {len(documents)} chunks, {tokens} token vectors, {size:.1f} MB")

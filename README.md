@@ -249,6 +249,12 @@ a matching CUDA build of torch and `sentence-transformers` picks it up on its ow
    None of these re-ingest. They read what is already in Neo4j, so they cost one
    pass each and can be re-run whenever material changes.
 
+   Page search defaults to ColSmol-500M, which costs about 1 GB of VRAM. Set
+   `colpali_model` to `vidore/colqwen2-v1.0` for the stronger model at about
+   4.5 GB. An index built by one model cannot be read by the other, so rebuild
+   after changing it — the index records which model wrote it and refuses a
+   mismatch rather than ranking nonsense.
+
    Re-running is safe: a document's chunks are replaced, and saved highlights are
    re-attached rather than orphaned. As a scale reference, a 19-file course
    produced 504 chunks and 715 distinct concepts.
