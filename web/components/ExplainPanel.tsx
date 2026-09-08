@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   explainSelection,
   listHighlights,
@@ -32,6 +32,16 @@ export function ExplainPanel({ document, selection, onClear }: Props) {
   const [error, setError] = useState("");
   const [kept, setKept] = useState<Highlight[]>([]);
   const [keptVersion, setKeptVersion] = useState(0);
+  const asideRef = useRef<HTMLElement | null>(null);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  // When the selection changes, bring the new content into view: reset the
+  // inner scroller and, below lg, scroll the whole panel up to the reader.
+  useEffect(() => {
+    if (!selection) return;
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+    asideRef.current?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+  }, [selection]);
 
   // The margin should not be empty on arrival: what was kept here before
   // belongs in it as much as what is being read now.
@@ -82,12 +92,15 @@ export function ExplainPanel({ document, selection, onClear }: Props) {
   }
 
   return (
-    <aside className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:max-h-none lg:w-[22rem] lg:border-t-0 lg:border-l xl:w-[26rem]">
+    <aside
+      ref={asideRef}
+      className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:max-h-none lg:w-[22rem] lg:border-t-0 lg:border-l xl:w-[26rem]"
+    >
       <div className="border-b border-rule px-6 py-4">
         <h2 className="apparatus text-slate">Annotation</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5">
+      <div ref={scrollerRef} className="flex-1 overflow-y-auto px-6 py-5">
         {!selection && (
           <p className="text-fine text-slate">
             Drag across any passage to bring it into the margin.
