@@ -8,6 +8,7 @@ import {
   type PathEdge,
 } from "@/lib/api";
 import { ConceptPanel } from "@/components/ConceptPanel";
+import { useCourse } from "@/lib/course";
 
 /**
  * The course as a path rather than a cloud: stages in the order they are
@@ -18,12 +19,13 @@ export function LearningPath() {
   const [path, setPath] = useState<Path | null>(null);
   const [failed, setFailed] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const { course } = useCourse();
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await getLearningPath();
+        const data = await getLearningPath(course);
         if (!cancelled) setPath(data);
       } catch {
         if (!cancelled) setFailed(true);
@@ -32,7 +34,7 @@ export function LearningPath() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [course]);
 
   const prerequisitesOf = (name: string) =>
     (path?.edges ?? []).filter((edge) => edge.source === name);

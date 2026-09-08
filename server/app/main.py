@@ -5,6 +5,7 @@ from app.routers import (
     chat,
     coach,
     concepts,
+    courses,
     documents,
     explain,
     graph,
@@ -29,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(courses.router)
 app.include_router(documents.router)
 app.include_router(explain.router)
 app.include_router(highlights.router)

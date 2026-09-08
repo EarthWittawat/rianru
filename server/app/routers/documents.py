@@ -11,11 +11,12 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 @router.get("")
-def list_documents(course: str = "CPE393") -> list[dict]:
+def list_documents(course: str | None = None) -> list[dict]:
     with get_driver().session() as session:
         result = session.run(
             """
-            MATCH (d:Document {course: $course})
+            MATCH (d:Document)
+            WHERE $course IS NULL OR d.course = $course
             OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:Chunk)
             RETURN d.id AS id, d.title AS title, d.topic AS topic,
                    d.course AS course, d.activity_type AS activity_type,

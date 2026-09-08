@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import { CourseProvider } from "@/lib/course";
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
@@ -29,8 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${sourceSerif.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink">
-        <NavBar />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <CourseProvider>
+          <NavBar />
+          <main className="flex flex-1 flex-col">{children}</main>
+        </CourseProvider>
       </body>
     </html>
   );

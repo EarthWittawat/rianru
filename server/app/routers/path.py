@@ -6,8 +6,8 @@ from app.services.neo4j_client import get_driver
 router = APIRouter(prefix="/path", tags=["path"])
 
 STAGES_QUERY = """
-MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(c:Chunk)-[:MENTIONS]->(e:Entity)
-WHERE d.position IS NOT NULL
+MATCH (d:Document)-[:HAS_CHUNK]->(c:Chunk)-[:MENTIONS]->(e:Entity)
+WHERE d.position IS NOT NULL AND ($course IS NULL OR d.course = $course)
 WITH d.topic AS topic, min(d.position) AS position, e, count(DISTINCT c) AS mentions
 RETURN topic, position,
        collect({name: e.name, type: e.type, mentions: mentions,
@@ -18,14 +18,15 @@ ORDER BY position
 EDGES_QUERY = """
 MATCH (a:Entity)-[r:REQUIRES]->(b:Entity)
 WHERE EXISTS {
-    MATCH (:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(a)
+    MATCH (d:Document)-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(a)
+    WHERE $course IS NULL OR d.course = $course
 }
 RETURN a.name AS source, b.name AS target, r.reason AS reason, r.origin AS origin
 """
 
 
 @router.get("")
-def get_path(course: str = "CPE393", min_mentions: int = 2) -> dict:
+def get_path(course: str | None = None, min_mentions: int = 2) -> dict:
     """The course as an ordered path: stages in teaching order, concepts by depth.
 
     Concepts mentioned once are usually extraction noise — a stray library name

@@ -122,11 +122,11 @@ def get_graph(topic: str | None = None) -> dict:
 
 
 @router.get("/topics")
-def list_topics(course: str = "CPE393") -> list[str]:
+def list_topics(course: str | None = None) -> list[str]:
     with get_driver().session() as session:
         return session.run(
-            "MATCH (d:Document {course: $course}) RETURN DISTINCT d.topic AS topic "
-            "ORDER BY topic",
+            "MATCH (d:Document) WHERE $course IS NULL OR d.course = $course "
+            "RETURN DISTINCT d.topic AS topic ORDER BY topic",
             course=course,
         ).value()
 

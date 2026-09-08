@@ -6,12 +6,14 @@ TOP_K = 6
 MAX_HISTORY_TURNS = 6
 
 
-def retrieve(question: str, top_k: int = TOP_K) -> list[dict]:
-    return similarity_search(question, top_k=top_k)
+def retrieve(question: str, top_k: int = TOP_K, course: str | None = None) -> list[dict]:
+    return similarity_search(question, top_k=top_k, course=course)
 
 
-def answer(question: str, history: list[dict] | None = None) -> dict:
-    sources = retrieve(question)
+def answer(
+    question: str, history: list[dict] | None = None, course: str | None = None
+) -> dict:
+    sources = retrieve(question, course=course)
     context = "\n\n".join(
         f"[{s['document_title']} — {s['topic']}"
         + (f", page {s['page']}" if s["page"] else "")

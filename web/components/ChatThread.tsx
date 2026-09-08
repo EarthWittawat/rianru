@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { askTutor, type ChatSource, type ChatTurn } from "@/lib/api";
 import { Markdown } from "@/components/Markdown";
+import { useCourse } from "@/lib/course";
 
 type Message = ChatTurn & { sources?: ChatSource[] };
 
@@ -19,6 +20,7 @@ export function ChatThread() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const { course } = useCourse();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,7 +37,7 @@ export function ChatThread() {
     setError("");
 
     try {
-      const reply = await askTutor(trimmed, history);
+      const reply = await askTutor(trimmed, history, course);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: reply.answer, sources: reply.sources },
