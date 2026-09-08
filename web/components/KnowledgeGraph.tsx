@@ -13,10 +13,11 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 type ForceNode = { [key: string]: unknown };
 const asGraphNode = (node: ForceNode) => node as unknown as GraphNode;
 
+// Rubric is reserved for the reader's own marks; the material itself is ink.
 const NODE_COLORS: Record<GraphNode["type"], string> = {
-  Document: "#2563eb",
-  Entity: "#0f172a",
-  Highlight: "#d97706",
+  Document: "#57534c",
+  Entity: "#1a1a1a",
+  Highlight: "#c23a2a",
 };
 
 const NODE_RADII: Record<GraphNode["type"], number> = {
@@ -78,15 +79,15 @@ export function KnowledgeGraph() {
   return (
     <div className="flex flex-1 overflow-hidden">
       <div className="flex flex-1 flex-col">
-        <div className="flex items-center gap-3 border-b border-neutral-200 bg-white px-6 py-3">
-          <label htmlFor="topic" className="text-xs text-neutral-500">
+        <div className="flex items-center gap-3 border-b border-rule px-6 py-3">
+          <label htmlFor="topic" className="apparatus">
             Topic
           </label>
           <select
             id="topic"
             value={topic}
             onChange={(event) => setTopic(event.target.value)}
-            className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm"
+            className="border border-rule bg-paper px-2 py-1 text-fine"
           >
             <option value="">Whole course</option>
             {topics.map((t) => (
@@ -95,12 +96,12 @@ export function KnowledgeGraph() {
               </option>
             ))}
           </select>
-          <span className="ml-auto text-xs text-neutral-500">
+          <span className="apparatus tabular ml-auto">
             {data.nodes.length} nodes · {data.edges.length} connections
           </span>
         </div>
 
-        <div ref={containerRef} className="relative flex-1 bg-neutral-50">
+        <div ref={containerRef} className="relative flex-1 bg-paper">
           {error && <CanvasMessage>{error}</CanvasMessage>}
           {!error && data.nodes.length === 0 && (
             <CanvasMessage>
@@ -112,9 +113,9 @@ export function KnowledgeGraph() {
               graphData={graphData}
               width={size.width}
               height={size.height}
-              backgroundColor="#fafafa"
+              backgroundColor="#f3eee3"
               nodeLabel={(node: ForceNode) => asGraphNode(node).label}
-              linkColor={() => "#d4d4d4"}
+              linkColor={() => "#cfc6b4"}
               linkWidth={0.6}
               linkDirectionalArrowLength={2.5}
               linkDirectionalArrowRelPos={1}
@@ -166,10 +167,10 @@ function drawNode(
   if (!showLabel) return;
 
   const fontSize = Math.max(10 / scale, 2.5);
-  ctx.font = `${fontSize}px ui-sans-serif, system-ui, sans-serif`;
+  ctx.font = `${fontSize}px "Source Serif 4", Georgia, serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  ctx.fillStyle = "#404040";
+  ctx.fillStyle = "#57534c";
   const label =
     graphNode.label.length > 28
       ? `${graphNode.label.slice(0, 28)}…`
@@ -185,40 +186,36 @@ function GraphDetail({
   onClose: () => void;
 }) {
   return (
-    <aside className="flex w-80 shrink-0 flex-col border-l border-neutral-200 bg-white">
-      <div className="border-b border-neutral-200 px-5 py-4">
-        <h2 className="text-sm font-medium">Details</h2>
-        <p className="mt-1 text-xs text-neutral-500">
-          Click any node to see what it is.
-        </p>
+    <aside className="flex w-80 shrink-0 flex-col border-l border-rule bg-paper-lift">
+      <div className="border-b border-rule px-6 py-4">
+        <h2 className="apparatus">Details</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        {!node && <p className="text-sm text-neutral-500">Nothing selected.</p>}
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        {!node && (
+          <p className="text-fine text-slate">
+            Click any node to see what it is.
+          </p>
+        )}
 
         {node && (
           <>
-            <span
-              className="inline-block rounded px-2 py-0.5 text-xs text-white"
-              style={{ backgroundColor: NODE_COLORS[node.type] }}
-            >
+            <p className="apparatus" style={{ color: NODE_COLORS[node.type] }}>
               {node.type}
-            </span>
-            <p className="mt-3 text-sm font-medium break-words">{node.label}</p>
-            {node.topic && (
-              <p className="mt-1 text-xs text-neutral-500">{node.topic}</p>
-            )}
+            </p>
+            <p className="mt-2 text-lead break-words">{node.label}</p>
+            {node.topic && <p className="apparatus mt-1.5">{node.topic}</p>}
             {node.entity_type && (
-              <p className="mt-1 text-xs text-neutral-500">{node.entity_type}</p>
+              <p className="apparatus mt-1.5">{node.entity_type}</p>
             )}
             {node.explanation && (
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">
+              <p className="bracketed mt-4 whitespace-pre-wrap text-fine text-slate">
                 {node.explanation}
               </p>
             )}
             <button
               onClick={onClose}
-              className="mt-4 text-xs text-neutral-500 hover:text-neutral-900"
+              className="apparatus mt-5 underline decoration-rule hover:text-rubric"
             >
               Clear
             </button>
@@ -233,11 +230,12 @@ function GraphDetail({
 
 function Legend() {
   return (
-    <ul className="mt-8 space-y-1.5 border-t border-neutral-200 pt-4">
+    <ul className="mt-10 border-t border-rule pt-4">
       {(Object.keys(NODE_COLORS) as GraphNode["type"][]).map((type) => (
-        <li key={type} className="flex items-center gap-2 text-xs text-neutral-600">
+        <li key={type} className="apparatus flex items-center gap-2 py-1">
           <span
-            className="h-2 w-2 rounded-full"
+            aria-hidden
+            className="h-2 w-2 shrink-0"
             style={{ backgroundColor: NODE_COLORS[type] }}
           />
           {type}
@@ -249,7 +247,7 @@ function Legend() {
 
 function CanvasMessage({ children }: { children: React.ReactNode }) {
   return (
-    <p className="absolute inset-0 flex items-center justify-center text-sm text-neutral-500">
+    <p className="absolute inset-0 flex items-center justify-center text-fine text-slate">
       {children}
     </p>
   );

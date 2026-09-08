@@ -28,14 +28,14 @@ export function CodeBlock({
       showLineNumbers={showLineNumbers}
       customStyle={{
         margin: 0,
-        borderRadius: "0.375rem",
+        borderRadius: 0,
         fontSize: "0.8125rem",
         lineHeight: 1.6,
-        background: "#fafafa",
-        border: "1px solid #e5e5e5",
+        background: "#f8f4ec",
+        border: "1px solid #cfc6b4",
         padding: "0.75rem 0.875rem",
       }}
-      codeTagProps={{ style: { fontFamily: "var(--font-geist-mono), monospace" } }}
+      codeTagProps={{ style: { fontFamily: "var(--font-plex-mono), monospace" } }}
     >
       {code.replace(/\n$/, "")}
     </SyntaxHighlighter>

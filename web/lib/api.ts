@@ -183,6 +183,21 @@ export function explainSelection(
   });
 }
 
+export type Highlight = {
+  id: string;
+  selected_text: string;
+  explanation: string;
+  page: number | null;
+  chunk_id: string;
+  document_id: string;
+  document_title: string;
+  topic: string;
+};
+
+export function listHighlights() {
+  return get<Highlight[]>("/highlights");
+}
+
 export function saveHighlight(
   chunkId: string,
   selectedText: string,

@@ -49,21 +49,25 @@ export function ChatThread() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6">
-      <div className="flex-1 space-y-6 overflow-y-auto py-8">
+      <div className="flex-1 space-y-8 overflow-y-auto py-12">
         {messages.length === 0 && (
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Tutor</h1>
-            <p className="mt-1 text-sm text-neutral-600">
-              Answers come from your CPE393 material, not the open internet.
+            <h1 className="text-display tracking-tight">Tutor</h1>
+            <p className="mt-2 max-w-[58ch] text-slate">
+              Answers are read out of your own course material, and say which
+              document and page they came from.
             </p>
-            <ul className="mt-6 space-y-2">
+            <ul className="mt-8">
               {SUGGESTIONS.map((suggestion) => (
-                <li key={suggestion}>
+                <li key={suggestion} className="border-b border-rule first:border-t">
                   <button
                     onClick={() => send(suggestion)}
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-left text-sm text-neutral-700 transition-colors hover:border-neutral-400"
+                    className="group flex w-full items-baseline gap-4 py-3 text-left"
                   >
-                    {suggestion}
+                    <span className="apparatus text-ash">Ask</span>
+                    <span className="text-fine group-hover:text-rubric group-hover:underline">
+                      {suggestion}
+                    </span>
                   </button>
                 </li>
               ))}
@@ -72,14 +76,14 @@ export function ChatThread() {
         )}
 
         {messages.map((message, index) => (
-          <MessageBubble key={index} message={message} />
+          <MessageTurn key={index} message={message} />
         ))}
 
         {pending && (
-          <p className="text-sm text-neutral-500">Reading your notes…</p>
+          <p className="apparatus animate-pulse">Reading your material…</p>
         )}
         {error && (
-          <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <p className="ruled-block border-rubric px-4 py-3 text-fine text-rubric-deep">
             {error}
           </p>
         )}
@@ -91,19 +95,19 @@ export function ChatThread() {
           event.preventDefault();
           send(input);
         }}
-        className="sticky bottom-0 flex gap-2 bg-neutral-50 py-4"
+        className="sticky bottom-0 flex gap-2 border-t border-rule bg-paper py-4"
       >
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask about anything in the course…"
           aria-label="Ask the tutor"
-          className="flex-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="flex-1 border border-rule bg-paper px-3 py-2 text-fine outline-none placeholder:text-ash focus:border-rubric"
         />
         <button
           type="submit"
           disabled={pending || !input.trim()}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white transition-colors hover:bg-neutral-700 disabled:opacity-40"
+          className="detent px-5 py-2 text-fine"
         >
           Ask
         </button>
@@ -112,19 +116,15 @@ export function ChatThread() {
   );
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageTurn({ message }: { message: Message }) {
   if (message.role === "user") {
     return (
-      <div className="flex justify-end">
-        <p className="max-w-[85%] rounded-lg bg-neutral-900 px-4 py-2.5 text-sm text-white">
-          {message.content}
-        </p>
-      </div>
+      <p className="bracketed max-w-[62ch] text-lead">{message.content}</p>
     );
   }
 
   return (
-    <div>
+    <div className="max-w-[68ch]">
       <Markdown>{message.content}</Markdown>
       {message.sources && message.sources.length > 0 && (
         <Sources sources={message.sources} />
@@ -140,12 +140,13 @@ function Sources({ sources }: { sources: ChatSource[] }) {
   );
 
   return (
-    <div className="mt-3 flex flex-wrap gap-1.5">
+    <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-rule pt-2">
+      <span className="apparatus">Read in</span>
       {unique.map((source) => (
         <Link
           key={source.document_id}
           href={`/viewer/${encodeURIComponent(source.document_id)}`}
-          className="rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-600 transition-colors hover:border-neutral-400"
+          className="apparatus tabular text-ink no-underline hover:text-rubric hover:underline"
         >
           {source.topic}
           {source.page ? ` · p${source.page}` : ""}

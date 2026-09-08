@@ -53,7 +53,7 @@ describe("StudyPlan", () => {
     await userEvent.click(screen.getByRole("button", { name: /plan my study/i }));
 
     expect(screen.getByText(/working through your results/i)).toBeInTheDocument();
-    expect(screen.getByText(/takes up to a minute/i)).toBeInTheDocument();
+    expect(screen.getByText(/minutes rather than seconds/i)).toBeInTheDocument();
 
     release(PLAN);
     await waitFor(() =>

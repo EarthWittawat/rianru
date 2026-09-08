@@ -19,41 +19,50 @@ export default async function ViewerIndexPage() {
   }, {});
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 py-12">
-      <h1 className="text-xl font-semibold tracking-tight">Course material</h1>
-      <p className="mt-1 text-sm text-neutral-600">
-        Open a document, then select any passage to have it explained.
+    <div className="mx-auto w-full max-w-4xl px-6 py-14">
+      <h1 className="text-display tracking-tight">Course material</h1>
+      <p className="mt-2 max-w-[60ch] text-slate">
+        Open a document, then drag across any passage to have it explained in
+        the margin.
       </p>
 
       {error && (
-        <p className="mt-8 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+        <p className="ruled-block mt-10 border-rubric px-4 py-3 text-fine text-rubric-deep">
           {error}
         </p>
       )}
 
       {!error && documents.length === 0 && (
-        <p className="mt-8 rounded-md border border-neutral-200 bg-white p-4 text-sm text-neutral-600">
-          Nothing ingested yet. Run{" "}
-          <code className="font-mono text-xs">python scripts/ingest.py --class CPE393</code>{" "}
-          from the server directory.
-        </p>
+        <div className="ruled-block mt-10 px-5 py-4">
+          <p className="text-fine text-slate">
+            Nothing ingested yet. From the server directory, run
+          </p>
+          <code className="mt-2 block font-mono text-fine text-ink">
+            python scripts/ingest.py --class YOUR_COURSE
+          </code>
+        </div>
       )}
 
-      <div className="mt-8 space-y-8">
-        {Object.entries(byTopic).map(([topic, docs]) => (
+      <div className="mt-12 space-y-10">
+        {Object.entries(byTopic).map(([topic, docs], index) => (
           <section key={topic}>
-            <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-              {topic}
-            </h2>
-            <ul className="mt-2 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
+            <div className="flex items-baseline gap-3 border-b border-rule pb-1.5">
+              <span className="apparatus tabular text-ash">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h2 className="apparatus text-ink">{topic}</h2>
+            </div>
+            <ul>
               {docs.map((doc) => (
-                <li key={doc.id}>
+                <li key={doc.id} className="border-b border-rule">
                   <Link
                     href={`/viewer/${encodeURIComponent(doc.id)}`}
-                    className="flex items-baseline justify-between gap-4 px-4 py-3 transition-colors hover:bg-neutral-50"
+                    className="group flex items-baseline justify-between gap-6 py-2.5 no-underline"
                   >
-                    <span className="text-sm">{doc.title}</span>
-                    <span className="shrink-0 text-xs text-neutral-500">
+                    <span className="group-hover:text-rubric group-hover:underline">
+                      {doc.title}
+                    </span>
+                    <span className="apparatus tabular shrink-0">
                       {doc.file_type} · {doc.chunk_count} chunks
                     </span>
                   </Link>
