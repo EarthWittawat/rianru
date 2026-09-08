@@ -37,6 +37,7 @@ CPE494 support, multi-user or auth, mobile.
 | LLM | Existing vLLM gateway (`VLLM_URL`, `VLLM_MODEL`, `VLLM_API_KEY` in `D:\leb2\.env`) | Already provisioned — reused for explanations, chat tutor, entity/relation extraction, and quiz generation, all via prompted chat completions |
 | PDF rendering | `pdf.js` / `react-pdf` | Text layer needed for click-to-select and highlight overlays |
 | Graph viz | `react-force-graph-2d` (or `cytoscape.js`) | Force-directed rendering of Neo4j nodes/edges |
+| Agent framework | LangChain 1.4 (`langchain`, `langchain-openai`) | The study coach is a supervisor agent whose tools are two specialist agents (progress, material) — subagents-as-tools, which LangChain recommends over the deprecated supervisor package. Multi-agent is a confirmed requirement, not an implementation detail: see `docs/intent/study-coach-agents.md` |
 
 ## Commands
 
@@ -48,6 +49,7 @@ docker compose down
 # Backend (from server/)
 uvicorn app.main:app --reload --port 8000        # dev server
 pytest                                            # tests
+pytest -m "not slow"                              # skip tests that hit the vLLM gateway
 ruff check . --fix                                # lint
 
 # Ingestion (from server/, run manually — not inside a live request)
@@ -72,8 +74,13 @@ D:\leb2/
   server/                  → FastAPI backend
     app/
       main.py
-      routers/             → explain.py, chat.py, graph.py, quiz.py, highlights.py
-      services/            → neo4j_client.py, vllm_client.py, embeddings.py, chunking.py
+      routers/             → explain.py, chat.py, graph.py, quiz.py, highlights.py,
+                              progress.py, coach.py
+      services/            → neo4j_client.py, vllm_client.py, embeddings.py, chunking.py,
+                              progress.py (SQLite), study_plan.py
+      agents/              → llm.py (gateway as a LangChain model), tools.py,
+                              specialists.py (progress + material agents), coach.py
+    data/                  → progress.db (SQLite, gitignored — personal, not course data)
       models/              → pydantic schemas
     scripts/
       ingest.py            → parses manifest.json → PDFs/ipynb → chunks → embeds →
@@ -85,6 +92,7 @@ D:\leb2/
       graph/                → knowledge graph page
       chat/                 → chat tutor page
       quiz/                 → quiz/flashcard page
+      coach/                → study plan page
     components/
     lib/
     tests/
@@ -172,6 +180,17 @@ Personal tool, single user — pragmatic bar, not exhaustive coverage:
    unretrieved general knowledge.
 8. `/quiz` generates N questions from a chosen topic's chunks and renders
    them with reveal/self-check.
+9. Answering a quiz question records an attempt in SQLite with its topic and
+   correctness, graded server-side from the stored answer — the client cannot
+   assert its own correctness. The home page ranks topics weakest-first.
+10. `POST /coach/plan` runs the LangChain coach — a supervisor whose tools are
+   a progress agent over the recorded attempts and a material agent over the
+   ingested documents — and returns concrete study tasks, each with a topic, a
+   source document and page, and why it was chosen. Nothing in a task is
+   invented: scores come from the attempt history and pages from the material.
+11. `/coach` generates a plan on one explicit action, persists it, re-reads the
+   latest plan on load without re-running the agent, and lets tasks be ticked
+   off durably.
 
 ## Open Questions
 

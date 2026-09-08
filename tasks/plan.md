@@ -2,6 +2,10 @@
 
 Source spec: `docs/SPEC-learning-tool.md`.
 
+This plan covers the original MVP (Tasks 1-20), all complete. The work that
+followed it — progress tracking and the multi-agent study coach — is tracked
+in `tasks/study-coach.md`.
+
 ## Overview
 
 Local Next.js + FastAPI + Neo4j app that ingests the CPE393 course folder,
@@ -18,7 +22,9 @@ data it produces.
   timeouts, per spec boundaries.
 - Neo4j is the only datastore — Document/Chunk/Entity/Highlight/QuizQuestion
   as nodes, dense embeddings on `Chunk` via Neo4j's native vector index. No
-  second DB.
+  second DB. (Amended 2026-09-08: personal quiz progress now lives in a
+  separate local SQLite file. Neo4j remains the single source of truth for the
+  course material itself — see the spec's Resolved Decisions.)
 - vLLM API key stays server-side only; all vLLM calls go through FastAPI,
   never called directly from the browser.
 - `manifest.json` is the source of truth for which files exist per class —
