@@ -1,5 +1,5 @@
-import { KnowledgeGraph } from "@/components/KnowledgeGraph";
+import { LearningPath } from "@/components/LearningPath";
 
 export default function GraphPage() {
-  return <KnowledgeGraph />;
+  return <LearningPath />;
 }

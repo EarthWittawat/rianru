@@ -4,10 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
     chat,
     coach,
+    concepts,
     documents,
     explain,
     graph,
     highlights,
+    path,
     progress,
     quiz,
 )
@@ -35,6 +37,8 @@ app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(progress.router)
 app.include_router(coach.router)
+app.include_router(path.router)
+app.include_router(concepts.router)
 
 
 @app.get("/health")

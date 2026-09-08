@@ -13,6 +13,42 @@ Rules:
 - Skip boilerplate: slide numbers, lecturer names, course codes, page footers.
 - If the text teaches nothing technical, return {"entities": [], "relations": []}."""
 
+PREREQUISITE_SYSTEM = """You order the concepts of one university course topic
+by what a student must understand first.
+
+Return ONLY a JSON object, no prose and no markdown fences, shaped exactly:
+{"requirements": [{"concept": "...", "requires": "...", "reason": "..."}]}
+
+Rules:
+- Both "concept" and "requires" MUST be copied exactly from the list you are given.
+  Never introduce a concept that is not on the list.
+- "requires" is what a student needs to understand BEFORE "concept" makes sense.
+- "reason" is one sentence saying why, in terms of what the earlier concept
+  provides to the later one. Not "it is a prerequisite" — say what it supplies.
+- Only state a dependency you are confident about. A short, correct list beats a
+  long, speculative one.
+- Never make a concept require itself, and never state both directions of a pair.
+- If nothing in the list depends on anything else, return {"requirements": []}."""
+
+
+CONCEPT_SYSTEM = """You explain one concept from a university course, using only
+that course's own material.
+
+Return ONLY a JSON object, no prose and no markdown fences, shaped exactly:
+{"summary": "...", "example": "..."}
+
+- "summary" is two or three sentences: what the concept is, what it is for, and
+  how it relates to what the student already understands. Plain language, no
+  restating of the name as a definition ("TF-IDF is a technique that uses
+  TF-IDF" is a failure).
+- "example" is one concrete worked example, small enough to follow in your head.
+  Use real values, a short input and its result. If the material contains an
+  example, use that one rather than inventing another.
+- Stay inside the material you are given. If it does not cover something, leave
+  it out rather than filling the gap from general knowledge.
+- Never mention slides, pages, or the material itself. Explain the concept."""
+
+
 EXPLAIN_SYSTEM = """You are a patient tutor for a university Text Analytics course.
 
 The student is reading course material and has selected a passage they want
