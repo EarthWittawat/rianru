@@ -11,6 +11,13 @@ COURSES = ("MULTIA", "MULTIB")
 
 @pytest.fixture(autouse=True)
 def two_courses():
+    # These search, so they need the vector index. A developer machine has one
+    # left over from ingest; a fresh CI database has nothing, and the query
+    # fails with "There is no such vector schema index" rather than returning
+    # no hits. The test seeds the schema it depends on.
+    graph_store.ensure_schema()
+    _await_indexes()
+
     _wipe()
     for course in COURSES:
         graph_store.write_document(
@@ -30,6 +37,12 @@ def two_courses():
         )
     yield
     _wipe()
+
+
+def _await_indexes() -> None:
+    """A freshly created vector index answers queries with nothing until online."""
+    with get_driver().session() as session:
+        session.run("CALL db.awaitIndexes(60)")
 
 
 def _wipe():
