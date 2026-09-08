@@ -134,6 +134,90 @@ def write_entities(
             )
 
 
+def set_document_positions(positions: dict[str, int]) -> None:
+    """Record where each document sits in the course's own teaching order.
+
+    The syllabus is a designed sequence, so this is recorded truth rather than
+    an inference: lecture 1 genuinely comes before lecture 6.
+    """
+    if not positions:
+        return
+
+    rows = [{"id": doc_id, "position": position} for doc_id, position in positions.items()]
+    with get_driver().session() as session:
+        session.run(
+            """
+            UNWIND $rows AS row
+            MATCH (d:Document {id: row.id})
+            SET d.position = row.position
+            """,
+            rows=rows,
+        )
+
+
+def concept_positions(
+    course: str, document_ids: list[str] | None = None
+) -> dict[str, float]:
+    """Each concept, keyed to the earliest positioned document that teaches it.
+
+    A concept introduced in lecture 1 and revisited in lecture 6 belongs to
+    lecture 1: that is where a student meets it first.
+
+    `document_ids` restricts the reading to those documents. Placing practice
+    material needs that: without it, a lab positioned by an earlier run feeds
+    its own position back in and drags itself across the course.
+    """
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(e:Entity)
+            WHERE d.position IS NOT NULL
+              AND ($ids IS NULL OR d.id IN $ids)
+            RETURN e.name AS name, min(d.position) AS position
+            """,
+            course=course,
+            ids=document_ids,
+        )
+        return {record["name"]: record["position"] for record in result}
+
+
+def concept_frequency(course: str, document_ids: list[str] | None = None) -> dict[str, int]:
+    """How many documents mention each concept — the rarity signal for placement."""
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(e:Entity)
+            WHERE $ids IS NULL OR d.id IN $ids
+            RETURN e.name AS name, count(DISTINCT d) AS documents
+            """,
+            course=course,
+            ids=document_ids,
+        )
+        return {record["name"]: record["documents"] for record in result}
+
+
+def clear_document_positions(course: str) -> None:
+    """Positions are recomputed from scratch, never accumulated."""
+    with get_driver().session() as session:
+        session.run(
+            "MATCH (d:Document {course: $course}) REMOVE d.position", course=course
+        )
+
+
+def document_concepts(course: str) -> dict[str, list[str]]:
+    """Every document in the course, with the concepts its chunks mention."""
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document {course: $course})
+            OPTIONAL MATCH (d)-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(e:Entity)
+            RETURN d.id AS id, collect(DISTINCT e.name) AS concepts
+            """,
+            course=course,
+        )
+        return {record["id"]: [c for c in record["concepts"] if c] for record in result}
+
+
 def similarity_search(query: str, top_k: int = 6) -> list[dict]:
     query_embedding = embed_text(query)
     with get_driver().session() as session:
