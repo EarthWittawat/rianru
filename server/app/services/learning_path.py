@@ -88,3 +88,37 @@ def timeline_requirements(
         }
 
     return list(edges.values())
+
+
+def dependency_depth(concepts: list[str], edges: list[dict]) -> dict[str, int]:
+    """How many prerequisites deep each concept sits.
+
+    Depth 0 is something you can start on. Depth 3 means three layers of the
+    course stand between a student and understanding it. Cycles are possible —
+    the model pass can contradict itself — so this walks each concept with a
+    visited set and treats a cycle as the end of the chain rather than failing.
+    """
+    known = set(concepts)
+    prerequisites: dict[str, list[str]] = {name: [] for name in concepts}
+    for edge in edges:
+        source, target = edge["source"], edge["target"]
+        if source in known and target in known:
+            prerequisites[source].append(target)
+
+    depths: dict[str, int] = {}
+
+    def walk(name: str, seen: frozenset[str]) -> int:
+        if name in depths:
+            return depths[name]
+        if name in seen:
+            return 0
+        chain = [walk(parent, seen | {name}) + 1 for parent in prerequisites[name]]
+        depth = max(chain, default=0)
+        if name not in seen:
+            depths[name] = depth
+        return depth
+
+    for name in concepts:
+        walk(name, frozenset())
+
+    return depths

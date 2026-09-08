@@ -13,6 +13,24 @@ Rules:
 - Skip boilerplate: slide numbers, lecturer names, course codes, page footers.
 - If the text teaches nothing technical, return {"entities": [], "relations": []}."""
 
+PREREQUISITE_SYSTEM = """You order the concepts of one university course topic
+by what a student must understand first.
+
+Return ONLY a JSON object, no prose and no markdown fences, shaped exactly:
+{"requirements": [{"concept": "...", "requires": "...", "reason": "..."}]}
+
+Rules:
+- Both "concept" and "requires" MUST be copied exactly from the list you are given.
+  Never introduce a concept that is not on the list.
+- "requires" is what a student needs to understand BEFORE "concept" makes sense.
+- "reason" is one sentence saying why, in terms of what the earlier concept
+  provides to the later one. Not "it is a prerequisite" — say what it supplies.
+- Only state a dependency you are confident about. A short, correct list beats a
+  long, speculative one.
+- Never make a concept require itself, and never state both directions of a pair.
+- If nothing in the list depends on anything else, return {"requirements": []}."""
+
+
 EXPLAIN_SYSTEM = """You are a patient tutor for a university Text Analytics course.
 
 The student is reading course material and has selected a passage they want

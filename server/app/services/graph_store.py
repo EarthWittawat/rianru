@@ -244,6 +244,23 @@ def clear_requirements(origin: str | None = None) -> None:
         )
 
 
+def concepts_by_topic(course: str) -> dict[str, list[str]]:
+    """Concepts grouped by the topic that teaches them, in teaching order."""
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(e:Entity)
+            WHERE d.position IS NOT NULL
+            WITH d.topic AS topic, min(d.position) AS position,
+                 collect(DISTINCT e.name) AS concepts
+            RETURN topic, position, concepts
+            ORDER BY position
+            """,
+            course=course,
+        )
+        return {record["topic"]: record["concepts"] for record in result}
+
+
 def clear_document_positions(course: str) -> None:
     """Positions are recomputed from scratch, never accumulated."""
     with get_driver().session() as session:

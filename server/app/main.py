@@ -8,6 +8,7 @@ from app.routers import (
     explain,
     graph,
     highlights,
+    path,
     progress,
     quiz,
 )
@@ -35,6 +36,7 @@ app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(progress.router)
 app.include_router(coach.router)
+app.include_router(path.router)
 
 
 @app.get("/health")
