@@ -73,43 +73,52 @@ export function StudyPlan() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 py-10">
-      <h1 className="text-xl font-semibold tracking-tight">Coach</h1>
-      <p className="mt-1 text-sm text-neutral-600">
-        Built from what you actually got wrong, pointed at the pages that cover it.
+    <div className="mx-auto w-full max-w-3xl px-6 py-14">
+      <h1 className="text-display tracking-tight">Coach</h1>
+      <p className="mt-2 max-w-[58ch] text-slate">
+        Built from what you actually got wrong, pointed at the pages that cover
+        it.
       </p>
 
-      <button
-        onClick={generate}
-        disabled={pending}
-        className="mt-6 rounded-md bg-neutral-900 px-4 py-2 text-sm text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
-      >
-        {pending ? "Working through your results…" : "Plan my study"}
-      </button>
+      <div className="mt-8 border-y border-rule py-3">
+        <button
+          onClick={generate}
+          disabled={pending}
+          className="detent px-4 py-1.5 text-fine"
+        >
+          {pending ? "Working through your results…" : "Plan my study"}
+        </button>
 
-      {pending && (
-        <p className="mt-3 text-xs text-neutral-500">
-          The coach checks your scores, then finds the right pages. Takes up to a
-          minute or so.
-        </p>
-      )}
+        {pending && (
+          <p className="mt-3 max-w-[58ch] text-fine text-slate">
+            The coach reads your scores, then goes looking for the right pages.
+            That is several agents in a row, so it usually takes minutes rather
+            than seconds. Leave this open — the plan appears here when it lands.
+          </p>
+        )}
+      </div>
 
       {error && (
-        <p className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+        <p className="ruled-block mt-6 border-rubric px-4 py-3 text-fine text-rubric-deep">
           {error}
         </p>
       )}
 
       {plan && plan.tasks.length > 0 && (
-        <ol className="mt-8 space-y-3">
-          {plan.tasks.map((task) => (
-            <TaskRow key={task.id} task={task} onToggle={() => toggle(task)} />
+        <ol className="mt-2">
+          {plan.tasks.map((task, index) => (
+            <TaskRow
+              key={task.id}
+              task={task}
+              index={index}
+              onToggle={() => toggle(task)}
+            />
           ))}
         </ol>
       )}
 
       {!plan && !pending && !error && (
-        <p className="mt-8 text-sm text-neutral-500">
+        <p className="mt-8 text-fine text-slate">
           No plan yet. Answer a few quiz questions, then ask for one.
         </p>
       )}
@@ -117,35 +126,50 @@ export function StudyPlan() {
   );
 }
 
-function TaskRow({ task, onToggle }: { task: StudyTask; onToggle: () => void }) {
+function TaskRow({
+  task,
+  index,
+  onToggle,
+}: {
+  task: StudyTask;
+  index: number;
+  onToggle: () => void;
+}) {
   return (
-    <li className="rounded-lg border border-neutral-200 bg-white p-4">
-      <div className="flex items-start gap-3">
+    <li className="border-b border-rule py-4">
+      <div className="flex items-start gap-4">
+        <span className="apparatus tabular w-6 shrink-0 pt-1 text-ash">
+          {String(index + 1).padStart(2, "0")}
+        </span>
         <input
           type="checkbox"
           checked={task.done}
           onChange={onToggle}
           aria-label={`Mark done: ${task.action}`}
-          className="mt-0.5 h-4 w-4 shrink-0 accent-neutral-900"
+          className="mt-1.5 h-3.5 w-3.5 shrink-0 accent-[#c23a2a]"
         />
         <div className="min-w-0 flex-1">
           <p
-            className={`text-sm ${task.done ? "text-neutral-400 line-through" : "text-neutral-900"}`}
+            className={
+              task.done
+                ? "text-fine text-ash line-through decoration-rubric"
+                : "text-fine text-ink"
+            }
           >
             {task.action}
           </p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-neutral-500">
+          <p className="apparatus tabular mt-1.5 flex flex-wrap items-baseline gap-x-3">
             <span>{task.topic}</span>
-            {task.est_minutes && <span>· {task.est_minutes} min</span>}
+            {task.est_minutes && <span>{task.est_minutes} min</span>}
             {task.source && (
               <span>
-                · {task.source.document_title}
+                {task.source.document_title}
                 {task.source.page ? `, p${task.source.page}` : ""}
               </span>
             )}
           </p>
           {task.why && (
-            <p className="mt-2 border-l-2 border-neutral-200 pl-2 text-xs text-neutral-600">
+            <p className="bracketed mt-3 max-w-[62ch] text-fine text-slate">
               {task.why}
             </p>
           )}

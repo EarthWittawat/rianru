@@ -43,14 +43,16 @@ export function QuizCard({
   }
 
   return (
-    <li className="rounded-lg border border-neutral-200 bg-white p-5">
-      <div className="flex gap-3">
-        <span className="shrink-0 text-xs text-neutral-400">{index + 1}</span>
+    <li className="border-t border-rule py-6">
+      <div className="flex gap-5">
+        <span className="apparatus tabular w-6 shrink-0 pt-1 text-ash">
+          {String(index + 1).padStart(2, "0")}
+        </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-neutral-900">{question.question}</p>
+          <p className="max-w-[62ch]">{question.question}</p>
 
           {isMultipleChoice ? (
-            <ul className="mt-3 space-y-1.5">
+            <ul className="mt-4 space-y-1.5">
               {question.options.map((option) => {
                 const isAnswer = option === question.answer;
                 const isPicked = option === choice;
@@ -59,49 +61,56 @@ export function QuizCard({
                     <button
                       onClick={() => pick(option)}
                       disabled={choice !== null}
-                      className={`w-full rounded-md border px-3 py-2 text-left text-sm transition-colors ${optionStyle(
+                      className={`w-full border px-3 py-2 text-left text-fine transition-colors ${optionStyle(
                         { checked, isAnswer, isPicked },
                       )}`}
                     >
-                      {option}
+                      <span className="flex items-baseline gap-3">
+                        <span aria-hidden className="apparatus w-4 shrink-0">
+                          {checked && isAnswer ? "✓" : checked && isPicked ? "✗" : ""}
+                        </span>
+                        {option}
+                      </span>
                     </button>
                   </li>
                 );
               })}
             </ul>
           ) : (
-            <div className="mt-3">
+            <div className="mt-4">
               {!revealed ? (
                 <button
                   onClick={() => setRevealed(true)}
-                  className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50"
+                  className="detent px-3 py-1.5 text-fine"
                 >
                   Show answer
                 </button>
               ) : (
                 <>
-                  <p className="rounded-md bg-neutral-50 p-3 text-sm text-neutral-800">
+                  <p className="bracketed max-w-[62ch] text-fine">
                     {question.answer}
                   </p>
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-4 flex items-center gap-3">
                     {selfGraded === null ? (
                       <>
-                        <span className="text-xs text-neutral-500">Did you get it?</span>
+                        <span className="apparatus">Did you get it?</span>
                         <button
                           onClick={() => selfGrade(true)}
-                          className="rounded-md border border-emerald-500 px-2.5 py-1 text-xs text-emerald-800 transition-colors hover:bg-emerald-50"
+                          className="detent px-2.5 py-1 text-fine"
                         >
                           I got it
                         </button>
                         <button
                           onClick={() => selfGrade(false)}
-                          className="rounded-md border border-red-400 px-2.5 py-1 text-xs text-red-800 transition-colors hover:bg-red-50"
+                          className="detent px-2.5 py-1 text-fine"
                         >
                           I missed it
                         </button>
                       </>
                     ) : (
-                      <span className="text-xs text-neutral-500">
+                      <span
+                        className={`apparatus ${selfGraded ? "text-slate" : "text-rubric"}`}
+                      >
                         {selfGraded ? "Marked as correct" : "Marked as missed"}
                       </span>
                     )}
@@ -112,13 +121,13 @@ export function QuizCard({
           )}
 
           {saveFailed && (
-            <p className="mt-3 text-xs text-amber-700">
+            <p className="mt-3 text-fine text-rubric-deep">
               Could not save that answer, so it will not count towards your weak areas.
             </p>
           )}
 
           {checked && question.explanation && (
-            <div className="mt-3 border-l-2 border-neutral-200 pl-3">
+            <div className="bracketed mt-4 max-w-[62ch] text-fine text-slate">
               <Markdown>{question.explanation}</Markdown>
             </div>
           )}
@@ -137,8 +146,8 @@ function optionStyle({
   isAnswer: boolean;
   isPicked: boolean;
 }) {
-  if (!checked) return "border-neutral-200 hover:border-neutral-400";
-  if (isAnswer) return "border-emerald-500 bg-emerald-50 text-emerald-900";
-  if (isPicked) return "border-red-400 bg-red-50 text-red-900";
-  return "border-neutral-200 text-neutral-500";
+  if (!checked) return "border-rule hover:border-ink";
+  if (isAnswer) return "border-ink bg-paper-lift text-ink";
+  if (isPicked) return "border-rubric text-rubric-deep";
+  return "border-rule text-ash";
 }

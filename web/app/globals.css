@@ -1,26 +1,197 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* The Annotated Edition: an unbleached paper ground, iron ink, one rubric
+   vermilion, and hairlines drawn at a single device pixel. No radius anywhere;
+   states are printed marks, not raised chrome. */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: #f3eee3;
+  --color-paper-deep: #ece5d6;
+  --color-paper-lift: #f8f4ec;
+  --color-ink: #1a1a1a;
+  --color-slate: #57534c;
+  --color-ash: #a39c8f;
+  --color-rubric: #c23a2a;
+  --color-rubric-deep: #98291c;
+  --color-rule: #cfc6b4;
+  --color-rule-strong: #a89e8b;
+
+  --font-serif: var(--font-source-serif), "Iowan Old Style", Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-apparatus: 0.6875rem;
+  --text-apparatus--line-height: 1.2;
+  --text-fine: 0.8125rem;
+  --text-fine--line-height: 1.45;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.45;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.25;
+  --text-display: 2.125rem;
+  --text-display--line-height: 1.1;
 }
 
-@media (prefers-color-scheme: dark) {
+:root {
+  color-scheme: light;
+  /* One hairline, drawn at a device pixel rather than a CSS pixel. */
+  --hair: 1px;
+}
+
+@media (min-resolution: 2dppx) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --hair: 0.5px;
   }
 }
 
+html {
+  scrollbar-color: var(--color-rule-strong) var(--color-paper);
+  scrollbar-width: thin;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The parts we did not draw still belong to the edition. */
+::selection {
+  background-color: color-mix(in srgb, var(--color-rubric) 22%, transparent);
+  color: var(--color-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule-strong);
+  border: 3px solid var(--color-paper);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate);
+}
+
+:where(input, textarea) {
+  caret-color: var(--color-rubric);
+}
+
+:where(a, button, [tabindex], input, textarea, select):focus-visible {
+  outline: var(--hair) solid var(--color-rubric);
+  outline-offset: 2px;
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: var(--hair);
+}
+
+@layer components {
+  /* Numerals in apparatus, scores and page keys line up in a column. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Small caps apparatus: column labels, keys, state marks. */
+  .apparatus {
+    font-size: var(--text-apparatus);
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+
+  /* A ruled control. Rest is a hairline; pressed fills with rubric. */
+  .detent {
+    border: var(--hair) solid var(--color-rule-strong);
+    background-color: transparent;
+    color: var(--color-ink);
+    transition:
+      background-color 160ms ease-out,
+      border-color 160ms ease-out,
+      color 160ms ease-out;
+  }
+
+  .detent:hover:not(:disabled) {
+    border-color: var(--color-ink);
+  }
+
+  .detent[data-state="on"],
+  .detent:active:not(:disabled) {
+    background-color: var(--color-rubric);
+    border-color: var(--color-rubric);
+    color: var(--color-paper);
+  }
+
+  .detent:disabled {
+    color: var(--color-ash);
+    border-color: var(--color-rule);
+    cursor: not-allowed;
+  }
+
+  /* The nav strip scrolls sideways on a narrow screen; its scrollbar is chrome
+     the edition does not want, and the strip is short enough to swipe. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* A note bracketed back into the line it belongs to. */
+  .bracketed {
+    border-left: var(--hair) solid var(--color-rubric);
+    padding-left: 0.75rem;
+  }
+
+  /* Corner detents: the ruling engine's mark on a block of apparatus. */
+  .ruled-block {
+    position: relative;
+    border: var(--hair) solid var(--color-rule);
+  }
+
+  .ruled-block::before,
+  .ruled-block::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-color: var(--color-rule-strong);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .ruled-block::before {
+    top: -1px;
+    left: -1px;
+    border-width: var(--hair) 0 0 var(--hair);
+  }
+
+  .ruled-block::after {
+    right: -1px;
+    bottom: -1px;
+    border-width: 0 var(--hair) var(--hair) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

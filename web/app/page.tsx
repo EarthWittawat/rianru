@@ -5,53 +5,67 @@ const SECTIONS = [
   {
     href: "/viewer",
     label: "Read",
-    description: "Open lecture PDFs and labs. Select any passage to get it explained.",
+    description: "Open a lecture or lab. Any passage you drag over gets explained in the margin.",
   },
   {
     href: "/graph",
     label: "Graph",
-    description: "See how concepts across the course connect, including your own highlights.",
+    description: "Every concept the material mentions, and the highlights you kept, as one map.",
   },
   {
     href: "/chat",
     label: "Tutor",
-    description: "Ask questions answered from the course material, not the open internet.",
+    description: "Ask a question. The answer comes from your documents and says which page.",
   },
   {
     href: "/quiz",
     label: "Quiz",
-    description: "Generate practice questions from any topic you have covered.",
+    description: "Practise a topic. Every answer is recorded, which is what the coach reads.",
+  },
+  {
+    href: "/coach",
+    label: "Coach",
+    description: "A plan built from what you actually got wrong, pointed at the pages that fix it.",
   },
 ];
 
 export default function Home() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight">CPE393 — Text Analytics</h1>
-      <p className="mt-2 text-neutral-600">
-        Your course material, made interactive.
+    <div className="mx-auto w-full max-w-4xl px-6 py-16">
+      <h1 className="text-display tracking-tight">
+        Your course material, read properly.
+      </h1>
+      <p className="mt-3 max-w-[58ch] text-lead text-slate">
+        Lectures, labs and notebooks in one place — annotated, questioned, and
+        turned into a plan.
       </p>
 
-      <section className="mt-10">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-          Where you stand
-        </h2>
+      <section className="mt-14">
+        <h2 className="apparatus border-b border-rule pb-1.5">Where you stand</h2>
         <ProgressSummary />
       </section>
 
-      <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-        {SECTIONS.map(({ href, label, description }) => (
-          <li key={href}>
-            <Link
-              href={href}
-              className="block h-full rounded-lg border border-neutral-200 bg-white p-5 transition-colors hover:border-neutral-400"
-            >
-              <span className="text-sm font-medium">{label}</span>
-              <span className="mt-1 block text-sm text-neutral-600">{description}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <section className="mt-14">
+        <h2 className="apparatus border-b border-rule pb-1.5">Contents</h2>
+        <ul>
+          {SECTIONS.map(({ href, label, description }, index) => (
+            <li key={href} className="border-b border-rule">
+              <Link
+                href={href}
+                className="group flex items-baseline gap-5 py-4 no-underline"
+              >
+                <span className="apparatus tabular w-6 shrink-0 text-ash">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="w-24 shrink-0 group-hover:text-rubric group-hover:underline">
+                  {label}
+                </span>
+                <span className="text-fine text-slate">{description}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

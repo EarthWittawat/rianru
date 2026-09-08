@@ -21,14 +21,14 @@ export default async function DocumentPage({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex items-baseline justify-between gap-4 border-b border-neutral-200 bg-white px-6 py-3">
+      <div className="flex items-baseline justify-between gap-6 border-b border-rule px-6 py-3">
         <div className="min-w-0">
-          <h1 className="truncate text-sm font-medium">{document.title}</h1>
-          <p className="text-xs text-neutral-500">{document.topic}</p>
+          <h1 className="truncate text-lead tracking-tight">{document.title}</h1>
+          <p className="apparatus mt-1">{document.topic}</p>
         </div>
         <Link
           href="/viewer"
-          className="shrink-0 text-xs text-neutral-600 hover:text-neutral-900"
+          className="apparatus shrink-0 text-slate no-underline hover:text-rubric"
         >
           All material
         </Link>
