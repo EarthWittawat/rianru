@@ -30,6 +30,7 @@ Thumbs.db
 # root-level directory that is not part of the project, so no course folder has
 # to be named here and a new one is ignored the moment it appears.
 /*/
+!/.github/
 !/docs/
 !/server/
 !/tasks/
