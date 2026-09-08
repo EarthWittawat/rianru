@@ -15,6 +15,19 @@ const CONCEPT = {
   sources: [],
 };
 
+function setViewport(wide: boolean) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: wide,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+
 describe("ConceptPanel", () => {
   beforeEach(() => {
     // The panel only leaves its loading state when the answer matches the
@@ -22,24 +35,29 @@ describe("ConceptPanel", () => {
     vi.mocked(getConcept).mockImplementation((name: string) =>
       Promise.resolve({ ...CONCEPT, name }),
     );
+    vi.mocked(Element.prototype.scrollIntoView).mockClear();
+    setViewport(true);
   });
 
-  it("brings itself into view when a concept is picked", async () => {
-    const scrollIntoView = vi.fn();
-    // jsdom implements neither, so both are installed for the assertion.
-    Element.prototype.scrollIntoView = scrollIntoView;
-
+  it("stays put on a wide screen, where it is already beside the content", async () => {
     const { rerender } = render(<ConceptPanel name={null} onSelect={() => {}} />);
-    expect(scrollIntoView).not.toHaveBeenCalled();
 
     rerender(<ConceptPanel name="backreference" onSelect={() => {}} />);
 
-    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    await waitFor(() => screen.getByText(CONCEPT.summary));
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it("brings itself up when stacked under the content", async () => {
+    setViewport(false);
+
+    const { rerender } = render(<ConceptPanel name={null} onSelect={() => {}} />);
+    rerender(<ConceptPanel name="backreference" onSelect={() => {}} />);
+
+    await waitFor(() => expect(Element.prototype.scrollIntoView).toHaveBeenCalled());
   });
 
   it("starts the new concept at the top rather than where the last one was left", async () => {
-    Element.prototype.scrollIntoView = vi.fn();
-
     const { container, rerender } = render(
       <ConceptPanel name="regex" onSelect={() => {}} />,
     );
@@ -53,12 +71,11 @@ describe("ConceptPanel", () => {
     await waitFor(() => expect(scroller.scrollTop).toBe(0));
   });
 
-  it("stays put while nothing is selected", () => {
-    const scrollIntoView = vi.fn();
-    Element.prototype.scrollIntoView = scrollIntoView;
+  it("does nothing at all while nothing is selected", () => {
+    setViewport(false);
 
     render(<ConceptPanel name={null} onSelect={() => {}} />);
 
-    expect(scrollIntoView).not.toHaveBeenCalled();
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
 });

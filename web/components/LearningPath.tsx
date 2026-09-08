@@ -40,8 +40,11 @@ export function LearningPath() {
     (path?.edges ?? []).filter((edge) => edge.source === name);
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
-      <div className="flex-1 overflow-y-auto px-6 py-12">
+    // No overflow-hidden here: it would clip the sticky panel's containing
+    // block, and a sticky element inside a clipped ancestor silently stops
+    // sticking. The window scrolls, the list scrolls with it, the panel stays.
+    <div className="flex flex-1 flex-col lg:flex-row">
+      <div className="flex-1 px-6 py-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-display tracking-tight">The path</h1>
           <p className="mt-2 max-w-[58ch] text-slate">

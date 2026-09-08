@@ -28,7 +28,14 @@ export function ConceptPanel({
   useEffect(() => {
     if (!name) return;
     if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
-    asideRef.current?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+
+    // On a wide screen the panel is sticky and already in view, so scrolling
+    // the window would only throw the reader's place away. Stacked under the
+    // content, it genuinely is off-screen and has to come up.
+    const stacked = !window.matchMedia("(min-width: 1024px)").matches;
+    if (stacked) {
+      asideRef.current?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+    }
   }, [name]);
 
   useEffect(() => {
@@ -61,7 +68,7 @@ export function ConceptPanel({
   return (
     <aside
       ref={asideRef}
-      className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:max-h-none lg:w-[24rem] lg:border-t-0 lg:border-l xl:w-[28rem]"
+      className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:sticky lg:top-0 lg:h-screen lg:max-h-none lg:w-[24rem] lg:border-t-0 lg:border-l xl:w-[28rem]"
     >
       <div className="border-b border-rule px-6 py-4">
         <h2 className="apparatus">Concept</h2>
