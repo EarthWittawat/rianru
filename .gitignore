@@ -26,10 +26,14 @@ server/.cache/
 .DS_Store
 Thumbs.db
 
-# Course material (read-only source, not project code)
-/CPE393 - Text Analytics/
-/CPE401 - Computer Engineering Project I/
-/CPE494 - Cloud Computing and Security/
+# Course material lives in folders at the repo root, one per class. Ignore every
+# root-level directory that is not part of the project, so no course folder has
+# to be named here and a new one is ignored the moment it appears.
+/*/
+!/docs/
+!/server/
+!/tasks/
+!/web/
 
 # Local progress database
 server/data/

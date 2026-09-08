@@ -30,11 +30,11 @@ last-minute exam-cram build. No hard deadline driving this.
 - Reuse the existing vLLM endpoint already configured in `D:\leb2\.env`
   (`VLLM_URL`, `VLLM_MODEL`, `VLLM_API_KEY`).
 - Build against CPE393 first (richest existing content: labs, PDFs,
-  notebooks across 6 topics) before expanding to CPE401 / CPE494.
+  notebooks across 6 topics) before expanding to any other course.
 
 ## Out of scope (for now)
 - Vercel/cloud deployment.
-- CPE401 and CPE494 support.
+- Support for other courses.
 - Multi-user support or auth.
 - Mobile access.
 

@@ -490,5 +490,5 @@ All 20 tasks completed and committed individually, each with its own tests.
   nothing to the graph.
 - Highlight re-attachment anchors on chunk index, so if a source file itself
   changes, a highlight may land on a shifted chunk.
-- CPE401 and CPE494 are not ingested; the ingest CLI takes `--class` and
+- No course other than CPE393 is ingested; the ingest CLI takes `--class` and
   would work, but nothing else was verified against them.

@@ -90,10 +90,10 @@ The plan is parsed from the model's JSON rather than requested via
 is present unless the server opts in, and this gateway does not. Malformed
 output degrades to an empty plan.
 
-**Evidence:** 8 tests in `server/tests/test_coach.py`. Verified live against
-real data: it identified the genuinely weakest topic from recorded attempts,
-cited real documents and pages, and noted that three attempts is too small a
-sample to draw firm conclusions from.
+**Evidence:** 8 tests in `server/tests/test_coach.py`. Verified live against a
+real attempt history: it identified the weakest topic from the recorded
+attempts, cited documents and pages that exist, and said outright that the
+sample was too small to draw firm conclusions from.
 
 ### M2-T5: Persist study plans and serve them ✅ (`435dff4`)
 **Delivered:** `server/app/services/study_plan.py` + `routers/coach.py` —
@@ -137,6 +137,6 @@ showing.
   load. There is no step cap or request timeout on the agent loop, so a
   degenerate run has no upper bound. Worth a bounded `recursion_limit`, a
   timeout, and an honest wait message.
-- Only one topic has recorded attempts, so the coach's own output says the
-  sample is too small to target anything else — the coaching quality bar cannot
-  really be judged until more quizzes are taken.
+- Only one topic had recorded attempts at closeout, and the coach said so
+  itself rather than targeting a topic it had no evidence for. The coaching
+  quality bar cannot really be judged until more quizzes are taken.
