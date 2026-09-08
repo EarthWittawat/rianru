@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.graph_store import ensure_schema
 from app.services.neo4j_client import get_driver
+from tests.conftest import requires_ingested_corpus
 
 client = TestClient(app)
 
@@ -32,6 +33,7 @@ def _pdf_document() -> dict:
     return client.get(f"/documents/{pdf_doc['id']}").json()
 
 
+@requires_ingested_corpus
 def test_saving_a_highlight_links_it_to_its_chunk():
     document = _pdf_document()
     chunk = document["chunks"][1]
@@ -62,6 +64,7 @@ def test_saving_a_highlight_links_it_to_its_chunk():
     assert record["explanation"] == "Because tests need a highlight."
 
 
+@requires_ingested_corpus
 def test_highlight_mentions_entities_found_in_the_selection():
     document = _pdf_document()
     chunk = document["chunks"][1]
@@ -160,6 +163,7 @@ def test_unknown_chunk_returns_404():
     assert response.status_code == 404
 
 
+@requires_ingested_corpus
 def test_lists_saved_highlights():
     document = _pdf_document()
     chunk = document["chunks"][1]

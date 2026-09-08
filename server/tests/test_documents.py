@@ -1,8 +1,11 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.conftest import requires_ingested_corpus
 
 client = TestClient(app)
+
+pytestmark = requires_ingested_corpus
 
 
 def test_lists_ingested_documents():

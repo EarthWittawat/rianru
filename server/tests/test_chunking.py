@@ -8,6 +8,12 @@ COURSE_ROOT = Path(__file__).resolve().parents[2] / "CPE393 - Text Analytics"
 LECTURE_PDF = COURSE_ROOT / "Learning Activity" / "01 - Introduction to Text Analytics" / "L1 - Intro.pdf"
 LAB_NOTEBOOK = COURSE_ROOT / "Assessment Activity" / "Lab 1 - RegEx" / "Lab1_regex.ipynb"
 
+# These read the real course files, which are not in the repository.
+pytestmark = pytest.mark.skipif(
+    not (LECTURE_PDF.exists() and LAB_NOTEBOOK.exists()),
+    reason="course material is not present; these tests parse the real files",
+)
+
 
 def test_pdf_chunks_carry_page_numbers():
     chunks = chunk_file(LECTURE_PDF)

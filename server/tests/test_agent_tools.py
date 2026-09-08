@@ -7,6 +7,7 @@ import pytest
 from app.agents import tools
 from app.config import settings
 from app.services import progress
+from tests.conftest import requires_ingested_corpus
 
 
 @pytest.fixture(autouse=True)
@@ -58,6 +59,7 @@ def test_recent_attempts_tool_filters_by_topic():
     assert payload[0]["topic"] == "Web Scraping"
 
 
+@requires_ingested_corpus
 def test_search_tool_returns_citable_excerpts():
     payload = json.loads(
         tools.search_course_material.invoke({"query": "regular expressions", "limit": 3})
@@ -69,12 +71,14 @@ def test_search_tool_returns_citable_excerpts():
     assert hit["excerpt"]
 
 
+@requires_ingested_corpus
 def test_list_topics_tool_covers_the_ingested_course():
     topics = json.loads(tools.list_topics.invoke({}))
 
     assert "Pattern Matching" in topics
 
 
+@requires_ingested_corpus
 def test_list_topic_documents_tool_returns_real_documents():
     payload = json.loads(tools.list_topic_documents.invoke({"topic": "Pattern Matching"}))
 
