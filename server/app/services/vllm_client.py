@@ -24,6 +24,7 @@ def chat(
     temperature: float = 0.2,
     max_tokens: int = 4096,
     transport: httpx.BaseTransport | None = None,
+    timeout: float = DEFAULT_TIMEOUT,
 ) -> str:
     """Send a chat completion and return the assistant's content.
 
@@ -43,7 +44,7 @@ def chat(
 
     for attempt in range(MAX_RETRIES):
         try:
-            with httpx.Client(timeout=DEFAULT_TIMEOUT, transport=transport) as client:
+            with httpx.Client(timeout=timeout, transport=transport) as client:
                 response = client.post(url, json=payload, headers=headers)
         except httpx.HTTPError as exc:
             raise VLLMError(f"vLLM request failed: {exc}") from exc

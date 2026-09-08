@@ -235,11 +235,23 @@ def write_requirements(edges: list[dict]) -> int:
     return summary.counters.relationships_created
 
 
-def clear_requirements(origin: str | None = None) -> None:
-    """Prerequisites are rebuilt from scratch; stale edges would outlive their reason."""
+def clear_requirements(course: str, origin: str | None = None) -> None:
+    """Prerequisites are rebuilt from scratch; stale edges would outlive their reason.
+
+    Scoped to one course. An unscoped delete here quietly wiped every edge in
+    the database the first time a test exercised it.
+    """
     with get_driver().session() as session:
         session.run(
-            "MATCH ()-[r:REQUIRES]->() WHERE $origin IS NULL OR r.origin = $origin DELETE r",
+            """
+            MATCH (a:Entity)-[r:REQUIRES]->(:Entity)
+            WHERE ($origin IS NULL OR r.origin = $origin)
+              AND EXISTS {
+                MATCH (:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(a)
+              }
+            DELETE r
+            """,
+            course=course,
             origin=origin,
         )
 

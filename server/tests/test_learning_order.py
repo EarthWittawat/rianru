@@ -127,7 +127,7 @@ def test_rebuilding_replaces_edges_of_one_origin_only():
         ]
     )
 
-    graph_store.clear_requirements(origin="timeline")
+    graph_store.clear_requirements(COURSE, origin="timeline")
 
     with get_driver().session() as session:
         remaining = [

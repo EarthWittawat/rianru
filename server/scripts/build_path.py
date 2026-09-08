@@ -46,7 +46,7 @@ def main() -> int:
     pairs = related_concept_pairs(args.course)
     edges = timeline_requirements(pairs, positions)
 
-    clear_requirements(origin="timeline")
+    clear_requirements(args.course, origin="timeline")
     written = write_requirements(edges)
     print(f"{len(pairs)} related pairs → {len(edges)} timeline prerequisites ({written} new)")
 

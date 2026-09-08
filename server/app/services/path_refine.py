@@ -20,8 +20,15 @@ from app.services.vllm_client import VLLMError, chat
 
 logger = logging.getLogger(__name__)
 
-# Enough concepts for the model to see a topic whole, few enough to answer well.
-MAX_CONCEPTS_PER_CALL = 60
+# Enough concepts for the model to see a topic whole, few enough that it can
+# finish. At 60 the reasoning model spent its whole budget thinking and returned
+# nothing; at 40 it answers.
+MAX_CONCEPTS_PER_CALL = 40
+
+# This is a harder question than chunk extraction, over more material, so it
+# needs both room to reason and time to arrive.
+MAX_TOKENS = 8192
+TIMEOUT_SECONDS = 300.0
 
 
 def parse_requirements(raw: str, known: set[str]) -> list[dict]:
@@ -56,7 +63,7 @@ def refine_course(course: str) -> int:
     """Ask the model for the prerequisites inside each topic. Returns edges written."""
     by_topic = concepts_by_topic(course)
     known = {name for names in by_topic.values() for name in names}
-    clear_requirements(origin="model")
+    clear_requirements(course, origin="model")
 
     written = 0
     for topic, concepts in by_topic.items():
@@ -74,6 +81,8 @@ def refine_course(course: str) -> int:
                     },
                 ],
                 temperature=0.0,
+                max_tokens=MAX_TOKENS,
+                timeout=TIMEOUT_SECONDS,
             )
         except VLLMError as exc:
             logger.warning("Prerequisite pass failed for %s: %s", topic, exc)
