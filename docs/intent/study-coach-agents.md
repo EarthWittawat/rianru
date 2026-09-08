@@ -11,7 +11,7 @@ one agent per task, each with its own tools, rather than a single prompt.
 
 ## User
 
-The student, studying CPE393, with a midterm the week of 2026-09-14.
+The student using this on their own course material, revising for an exam.
 
 ## Why now
 
@@ -21,8 +21,9 @@ the missing half.
 
 ## Success looks like
 
-Opening the app and being told something like "you missed 3 of 5 on TF-IDF —
-read L6 pages 19-27, then try these questions", and that being the right call.
+Opening the app and being told something like "you missed most of the questions
+on this topic — read these specific pages, then try these questions", and that
+being the right call.
 
 Three capabilities the student named:
 1. Suggest what to study next.
@@ -50,15 +51,15 @@ Three capabilities the student named:
 - **Embedded JupyterLab and code execution.** Explicitly deferred by the
   student ("jupyter part can be later"). The related complaint — notebook code
   rendering as flat text — was fixed separately and is already shipped.
-- CPE401 and CPE494.
+- Any course other than the one being ingested.
 - Multi-user, auth, cloud deployment.
 
 ## Open question to resolve at spec time
 
-The midterm is the week of 2026-09-14. Building a multi-agent system competes
-for time with actually studying for it. Worth deciding whether the prerequisite
-(progress tracking + a simple weakness report) ships alone first, with the
-agent layer following after the midterm.
+An exam is close. Building a multi-agent system competes for time with actually
+studying for it. Worth deciding whether the prerequisite (progress tracking +
+a simple weakness report) ships alone first, with the agent layer following
+after the exam.
 
 ## Notes for the build
 

@@ -23,8 +23,8 @@ personal study across the semester (no deadline pressure, no other users).
 **Success looks like:** all five steps above work end-to-end against the
 CPE393 folder specifically — see Success Criteria.
 
-**Explicitly out of scope for this spec:** Vercel/cloud deployment, CPE401 /
-CPE494 support, multi-user or auth, mobile.
+**Explicitly out of scope for this spec:** Vercel/cloud deployment, support for
+any course beyond the one being ingested, multi-user or auth, mobile.
 
 ## Tech Stack
 
