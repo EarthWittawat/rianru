@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getConcept, type ConceptDetail } from "@/lib/api";
 import { Markdown } from "@/components/Markdown";
 
@@ -20,6 +20,16 @@ export function ConceptPanel({
 }) {
   const [concept, setConcept] = useState<ConceptDetail | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
+  const asideRef = useRef<HTMLElement | null>(null);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  // When the concept changes, bring the new content into view: reset the
+  // inner scroller and, below lg, scroll the whole panel up to the reader.
+  useEffect(() => {
+    if (!name) return;
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+    asideRef.current?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+  }, [name]);
 
   useEffect(() => {
     if (!name) return;
@@ -49,12 +59,15 @@ export function ConceptPanel({
         : "loading";
 
   return (
-    <aside className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:max-h-none lg:w-[24rem] lg:border-t-0 lg:border-l xl:w-[28rem]">
+    <aside
+      ref={asideRef}
+      className="flex max-h-[45vh] w-full shrink-0 flex-col border-t border-rule bg-paper-lift lg:max-h-none lg:w-[24rem] lg:border-t-0 lg:border-l xl:w-[28rem]"
+    >
       <div className="border-b border-rule px-6 py-4">
         <h2 className="apparatus">Concept</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5">
+      <div ref={scrollerRef} className="flex-1 overflow-y-auto px-6 py-5">
         {!name && (
           <p className="text-fine text-slate">
             Pick anything on the path to see what it is, an example of it, and
