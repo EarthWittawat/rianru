@@ -259,4 +259,3 @@ web/
 
 Course material is read-only input and is never committed — the course folders,
 `manifest.json`, `.env` and the local progress database are all gitignored.
-test
