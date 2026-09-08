@@ -23,8 +23,9 @@ personal study across the semester (no deadline pressure, no other users).
 **Success looks like:** all five steps above work end-to-end against the
 CPE393 folder specifically — see Success Criteria.
 
-**Explicitly out of scope for this spec:** Vercel/cloud deployment, support for
-any course beyond the one being ingested, multi-user or auth, mobile.
+**Explicitly out of scope for this spec:** Vercel/cloud deployment, multi-user
+or auth, mobile. (Support for more than one course *was* out of scope and is
+now built — see Resolved Decisions.)
 
 ## Tech Stack
 
@@ -220,8 +221,24 @@ Personal tool, single user — pragmatic bar, not exhaustive coverage:
   the "no local GPU" premise the ColBERT/ColQwen deferral below rests on —
   that decision is now open to revisit on quality grounds rather than closed
   on hardware grounds.
-- **Embeddings — dense vs. ColBERT/ColQwen (2026-09-07):** dense
-  `sentence-transformers` for MVP. No local GPU; ColBERT/ColQwen both need
-  multi-vector storage outside Neo4j. Revisit as a post-MVP upgrade if
-  retrieval quality on figures/tables/layout turns out to matter and GPU
-  becomes available.
+- **Embeddings — dense, then late interaction (2026-09-08):** dense
+  `sentence-transformers` shipped first, and still answers any course without
+  an index. ColBERT (text) and ColPali/ColQwen2 (page images) are now built on
+  top of it, which reverses the 2026-09-07 deferral below: the GPU exists, and
+  the multi-vector storage that was going to need PLAID turned out not to. A
+  course is a few hundred chunks and a couple of hundred pages, so every vector
+  fits in memory and scoring is a direct pass — `server/data/colbert/` and
+  `server/data/colpali/`, one compressed float16 file per course, 6 MB and
+  27 MB respectively for CPE393.
+
+  ColPali answers with a place rather than a passage. The gateway serves a text
+  model, so a page image has nowhere to go; what visual search returns is the
+  document and page to open, which is what "find the slide with the chart"
+  actually asks for.
+
+- **One course at a time is over (2026-09-08):** the spec's "explicitly out of
+  scope: CPE401 / CPE494 support" no longer holds. Every list, the path, and
+  the tutor take a course; the class is chosen in the interface and remembered
+  in the browser. Retrieval is scoped with it, because a tutor answering a
+  text-analytics question out of a cloud-security lecture is worse than no
+  answer.

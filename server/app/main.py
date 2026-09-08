@@ -8,6 +8,7 @@ from app.routers import (
     courses,
     documents,
     explain,
+    pages,
     graph,
     highlights,
     path,
@@ -41,6 +42,7 @@ app.include_router(progress.router)
 app.include_router(coach.router)
 app.include_router(path.router)
 app.include_router(concepts.router)
+app.include_router(pages.router)
 
 
 @app.get("/health")

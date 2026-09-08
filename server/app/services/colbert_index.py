@@ -17,49 +17,29 @@ from pathlib import Path
 
 import numpy as np
 
+from app.services.multivector import load_index, maxsim, rank, save_index
+
 logger = logging.getLogger(__name__)
+
+__all__ = [
+    "cached_index",
+    "encode_documents",
+    "encode_query",
+    "has_index",
+    "index_path",
+    "load_index",
+    "maxsim",
+    "rank",
+    "save_index",
+    "search",
+]
 
 MODEL_NAME = "lightonai/GTE-ModernColBERT-v1"
 INDEX_DIR = Path(__file__).resolve().parents[2] / "data" / "colbert"
 
 
-def maxsim(query: np.ndarray, document: np.ndarray) -> float:
-    """Late interaction: each query token takes its best match, and those sum.
-
-    The maximum rather than the mean is the whole point. A chunk that answers
-    one query token perfectly and ignores the rest should not be dragged down
-    by its own length.
-    """
-    if query.size == 0 or document.size == 0:
-        return 0.0
-    return float(np.max(query @ document.T, axis=1).sum())
-
-
-def rank(
-    query: np.ndarray, documents: dict[str, np.ndarray], top_k: int = 6
-) -> list[tuple[str, float]]:
-    scored = ((chunk_id, maxsim(query, vectors)) for chunk_id, vectors in documents.items())
-    return sorted(scored, key=lambda pair: pair[1], reverse=True)[:top_k]
-
-
 def index_path(course: str) -> Path:
     return INDEX_DIR / f"{course}.npz"
-
-
-def save_index(path: Path, documents: dict[str, np.ndarray]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    # float16 halves the file for a difference well below the noise floor of
-    # the ranking itself.
-    np.savez_compressed(
-        path, **{chunk_id: vectors.astype(np.float16) for chunk_id, vectors in documents.items()}
-    )
-
-
-def load_index(path: Path) -> dict[str, np.ndarray]:
-    if not path.exists():
-        return {}
-    with np.load(path) as archive:
-        return {name: archive[name].astype(np.float32) for name in archive.files}
 
 
 @lru_cache(maxsize=4)

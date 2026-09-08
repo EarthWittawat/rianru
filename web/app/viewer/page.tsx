@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { listDocuments, type DocumentSummary } from "@/lib/api";
 import { useCourse } from "@/lib/course";
+import { PageSearch } from "@/components/PageSearch";
 
 export default function ViewerIndexPage() {
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
@@ -41,6 +42,8 @@ export default function ViewerIndexPage() {
         Open a document, then drag across any passage to have it explained in
         the margin.
       </p>
+
+      <PageSearch />
 
       {error && (
         <p className="ruled-block mt-10 border-rubric px-4 py-3 text-fine text-rubric-deep">

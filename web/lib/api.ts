@@ -230,6 +230,20 @@ export function saveHighlight(
   });
 }
 
+export type PageHit = {
+  document_id: string;
+  document_title: string;
+  page: number;
+  score: number;
+};
+
+/** Visual page search: what a page looks like, not only the words on it. */
+export function searchPages(query: string, course?: string) {
+  return get<{ indexed: boolean; hits: PageHit[] }>(
+    `/pages/search${courseQuery(course, { q: query })}`,
+  );
+}
+
 export type PathConcept = {
   name: string;
   type: string;
