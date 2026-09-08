@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services import quiz as quiz_service
 from app.services.neo4j_client import get_driver
+from tests.conftest import requires_ingested_corpus
 
 client = TestClient(app)
 
@@ -44,6 +45,7 @@ def _a_topic() -> str:
     return client.get("/graph/topics").json()[0]
 
 
+@requires_ingested_corpus
 def test_generate_returns_both_question_formats(monkeypatch):
     captured = {}
 
@@ -61,6 +63,7 @@ def test_generate_returns_both_question_formats(monkeypatch):
     assert len(captured["messages"][-1]["content"]) > 200, "excerpts must be prompted"
 
 
+@requires_ingested_corpus
 def test_generated_questions_are_persisted_and_refetchable(monkeypatch):
     monkeypatch.setattr(quiz_service, "chat", lambda messages, **kwargs: SAMPLE_RESPONSE)
     topic = _a_topic()
@@ -71,6 +74,7 @@ def test_generated_questions_are_persisted_and_refetchable(monkeypatch):
     assert any(q["question"] == "What does IDF weight against?" for q in stored)
 
 
+@requires_ingested_corpus
 def test_multiple_choice_answer_must_be_one_of_its_options(monkeypatch):
     bad = json.dumps(
         {
@@ -99,6 +103,7 @@ def test_unknown_topic_returns_404(monkeypatch):
     assert response.status_code == 404
 
 
+@requires_ingested_corpus
 def test_malformed_model_output_is_a_502(monkeypatch):
     monkeypatch.setattr(
         quiz_service, "chat", lambda messages, **kwargs: "I cannot do that."

@@ -1,9 +1,12 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.conftest import requires_ingested_corpus
 from app.services import explain as explain_service
 
 client = TestClient(app)
+
+pytestmark = requires_ingested_corpus
 
 
 def _pdf_document() -> dict:
