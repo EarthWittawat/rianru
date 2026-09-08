@@ -66,7 +66,9 @@ npm run lint
 ```
 D:\leb2/
   .env                    → existing leb2 + vLLM credentials (never committed)
-  manifest.json           → existing course/file index (read by ingest script)
+  manifest.json           → existing course/file index (read by ingest script);
+                              local only, not committed — it lists the enrolled
+                              classes and their assignments
   docker-compose.yml       → Neo4j service definition
   docs/
     intent/                → confirmed intents (interview-me output)

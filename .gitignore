@@ -33,3 +33,6 @@ Thumbs.db
 
 # Local progress database
 server/data/
+
+# Course index — lists enrolled classes and assignments; regenerate locally
+manifest.json
