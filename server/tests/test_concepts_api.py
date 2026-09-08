@@ -68,7 +68,16 @@ def test_explanation_is_written_on_first_request_and_cites_its_source(monkeypatc
     assert body["sources"][0]["page"] == 4
 
 
-def test_prerequisites_come_back_with_the_reason_for_each():
+def test_prerequisites_come_back_with_the_reason_for_each(monkeypatch):
+    # Stubbed like every other test here: prerequisites are read from the graph
+    # and need no model, but the endpoint writes an explanation on the way past,
+    # and a test that reaches a real gateway passes or fails on the weather.
+    monkeypatch.setattr(
+        concept_service,
+        "chat",
+        lambda *_, **__: '{"summary": "A widget batches records.", "example": "x"}',
+    )
+
     body = client.get(f"/concepts/{NAME}").json()
 
     assert body["requires"] == [
