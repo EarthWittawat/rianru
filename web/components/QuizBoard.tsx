@@ -8,6 +8,7 @@ import {
   type QuizQuestion,
 } from "@/lib/api";
 import { QuizCard } from "@/components/QuizCard";
+import { useCourse } from "@/lib/course";
 
 export function QuizBoard() {
   const [topics, setTopics] = useState<string[]>([]);
@@ -20,16 +21,18 @@ export function QuizBoard() {
   });
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const { course } = useCourse();
   const questions = loaded.topic === topic ? loaded.questions : [];
 
   useEffect(() => {
-    getTopics()
+    getTopics(course)
       .then((list) => {
         setTopics(list);
-        setTopic((current) => current || list[0] || "");
+        // The previous class's topic means nothing here, so take the first.
+        setTopic((current) => (list.includes(current) ? current : list[0] || ""));
       })
       .catch(() => setError("Could not reach the API. Is the backend running?"));
-  }, []);
+  }, [course]);
 
   useEffect(() => {
     if (!topic) return;

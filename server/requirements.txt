@@ -7,7 +7,7 @@ pytest==8.3.4
 ruff==0.8.6
 pdfplumber==0.11.10
 nbformat==5.11.1
-sentence-transformers==6.0.1
+sentence-transformers==5.3.0
 
 # torch arrives via sentence-transformers, but plain PyPI serves a CPU-only
 # build. This machine has an RTX 5070 Ti (Blackwell, sm_120), which needs a
@@ -18,3 +18,16 @@ sentence-transformers==6.0.1
 # server holds torch/_C.pyd open and the uninstall half-fails.
 langchain==1.4.0
 langchain-openai==1.6.0
+
+# Late-interaction retrieval (ColBERT). Pulls its own sentence-transformers and
+# transformers pins, which is why the version above moved down rather than up.
+pylate==1.6.0
+
+# Page-image retrieval (ColPali). Install with --no-deps: its torchvision
+# dependency resolves a CPU torch that overwrites the CUDA build, and on Windows
+# that uninstall half-fails and leaves the environment unimportable.
+#   pip install torch==2.11.0 torchvision --index-url https://download.pytorch.org/whl/cu128
+#   pip install --no-deps colpali-engine==0.3.18
+#   pip install "peft>=0.18.0,<0.21.0" "pillow>=10.0.0"
+colpali-engine==0.3.18
+pypdfium2==5.13.0

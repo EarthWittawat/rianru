@@ -16,5 +16,12 @@ class Settings(BaseSettings):
     # graph. Relative to the server/ directory the app is launched from.
     progress_db_path: str = "data/progress.db"
 
+    # Page-image retrieval. ColSmol-500M is the default because it costs about
+    # 1 GB of VRAM against colqwen2-v1.0's 4.5 GB, and the machine running this
+    # also has to render PDFs. Set colpali_model to vidore/colqwen2-v1.0 for
+    # the stronger model; an index built by one is unusable by the other, so
+    # rebuild after changing it.
+    colpali_model: str = "vidore/colSmol-500M"
+
 
 settings = Settings()

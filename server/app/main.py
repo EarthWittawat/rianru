@@ -5,8 +5,10 @@ from app.routers import (
     chat,
     coach,
     concepts,
+    courses,
     documents,
     explain,
+    pages,
     graph,
     highlights,
     path,
@@ -29,6 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(courses.router)
 app.include_router(documents.router)
 app.include_router(explain.router)
 app.include_router(highlights.router)
@@ -39,6 +42,7 @@ app.include_router(progress.router)
 app.include_router(coach.router)
 app.include_router(path.router)
 app.include_router(concepts.router)
+app.include_router(pages.router)
 
 
 @app.get("/health")

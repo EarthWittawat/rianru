@@ -73,10 +73,15 @@ describe("ChatThread", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
 
     await waitFor(() => {
-      expect(askTutor).toHaveBeenLastCalledWith("Second question", [
-        { role: "user", content: "First question" },
-        { role: "assistant", content: "First answer." },
-      ]);
+      expect(askTutor).toHaveBeenLastCalledWith(
+        "Second question",
+        [
+          { role: "user", content: "First question" },
+          { role: "assistant", content: "First answer." },
+        ],
+        // No class selected outside the provider, so the tutor searches all of them.
+        undefined,
+      );
     });
   });
 });

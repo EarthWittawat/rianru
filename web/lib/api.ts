@@ -33,8 +33,27 @@ async function get<T>(path: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function listDocuments() {
-  return get<DocumentSummary[]>("/documents");
+export type Course = {
+  code: string;
+  documents: number;
+  chunks: number;
+  topics: number;
+};
+
+export function listCourses() {
+  return get<Course[]>("/courses");
+}
+
+/** Every list is scoped to the course being studied; omitting it means all of them. */
+function courseQuery(course?: string, extra: Record<string, string> = {}) {
+  const params = new URLSearchParams(extra);
+  if (course) params.set("course", course);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export function listDocuments(course?: string) {
+  return get<DocumentSummary[]>(`/documents${courseQuery(course)}`);
 }
 
 export function getDocument(id: string) {
@@ -135,10 +154,11 @@ export type ChatSource = {
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
-export function askTutor(message: string, history: ChatTurn[]) {
+export function askTutor(message: string, history: ChatTurn[], course?: string) {
   return post<{ answer: string; sources: ChatSource[] }>("/chat", {
     message,
     history,
+    course,
   });
 }
 
@@ -158,8 +178,8 @@ export function getGraph(topic?: string) {
   return get<{ nodes: GraphNode[]; edges: GraphEdge[] }>(`/graph${query}`);
 }
 
-export function getTopics() {
-  return get<string[]>("/graph/topics");
+export function getTopics(course?: string) {
+  return get<string[]>(`/graph/topics${courseQuery(course)}`);
 }
 
 export type Explanation = {
@@ -210,6 +230,20 @@ export function saveHighlight(
   });
 }
 
+export type PageHit = {
+  document_id: string;
+  document_title: string;
+  page: number;
+  score: number;
+};
+
+/** Visual page search: what a page looks like, not only the words on it. */
+export function searchPages(query: string, course?: string) {
+  return get<{ indexed: boolean; hits: PageHit[] }>(
+    `/pages/search${courseQuery(course, { q: query })}`,
+  );
+}
+
 export type PathConcept = {
   name: string;
   type: string;
@@ -233,8 +267,10 @@ export type PathEdge = {
 
 export type LearningPath = { stages: PathStage[]; edges: PathEdge[] };
 
-export function getLearningPath(minMentions = 2) {
-  return get<LearningPath>(`/path?min_mentions=${minMentions}`);
+export function getLearningPath(course?: string, minMentions = 2) {
+  return get<LearningPath>(
+    `/path${courseQuery(course, { min_mentions: String(minMentions) })}`,
+  );
 }
 
 export type ConceptDetail = {
