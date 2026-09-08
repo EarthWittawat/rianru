@@ -20,10 +20,12 @@ from app.services.vllm_client import VLLMError, chat
 
 logger = logging.getLogger(__name__)
 
-# Enough concepts for the model to see a topic whole, few enough that it can
-# finish. At 60 the reasoning model spent its whole budget thinking and returned
-# nothing; at 40 it answers.
-MAX_CONCEPTS_PER_CALL = 40
+# The gateway closes a request at its own edge timeout — a 524 — long before
+# the client one, so the call has to be small enough to finish inside it. At 60
+# concepts the model spent its whole token budget reasoning; at 40 the gateway
+# hung up. 20 answers, and since concepts arrive most-mentioned first, they are
+# the 20 that matter.
+MAX_CONCEPTS_PER_CALL = 20
 
 # This is a harder question than chunk extraction, over more material, so it
 # needs both room to reason and time to arrive.

@@ -9,8 +9,8 @@ const SECTIONS = [
   },
   {
     href: "/graph",
-    label: "Graph",
-    description: "Every concept the material mentions, and the highlights you kept, as one map.",
+    label: "Path",
+    description: "The course in the order it teaches, and what each concept stands on.",
   },
   {
     href: "/chat",

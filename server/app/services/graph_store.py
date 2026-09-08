@@ -261,10 +261,12 @@ def concepts_by_topic(course: str) -> dict[str, list[str]]:
     with get_driver().session() as session:
         result = session.run(
             """
-            MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(e:Entity)
+            MATCH (d:Document {course: $course})-[:HAS_CHUNK]->(c:Chunk)-[:MENTIONS]->(e:Entity)
             WHERE d.position IS NOT NULL
-            WITH d.topic AS topic, min(d.position) AS position,
-                 collect(DISTINCT e.name) AS concepts
+            WITH d.topic AS topic, e, count(DISTINCT c) AS mentions,
+                 min(d.position) AS position
+            ORDER BY mentions DESC, e.name
+            WITH topic, min(position) AS position, collect(e.name) AS concepts
             RETURN topic, position, concepts
             ORDER BY position
             """,

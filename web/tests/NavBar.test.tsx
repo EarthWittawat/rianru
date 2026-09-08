@@ -10,7 +10,7 @@ vi.mock("next/navigation", () => ({
 describe("NavBar", () => {
   it("links to every section", () => {
     render(<NavBar />);
-    for (const label of ["Read", "Graph", "Tutor", "Quiz"]) {
+    for (const label of ["Read", "Path", "Tutor", "Quiz", "Coach"]) {
       expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
     }
   });
@@ -22,7 +22,7 @@ describe("NavBar", () => {
       "aria-current",
       "page",
     );
-    expect(screen.getByRole("link", { name: "Graph" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Path" })).not.toHaveAttribute(
       "aria-current",
     );
   });

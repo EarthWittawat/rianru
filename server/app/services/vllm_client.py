@@ -49,9 +49,13 @@ def chat(
         except httpx.HTTPError as exc:
             raise VLLMError(f"vLLM request failed: {exc}") from exc
 
-        if response.status_code == 429 and attempt < MAX_RETRIES - 1:
+        # 429 is the per-key concurrency cap; 5xx is the gateway itself, most
+        # often a 524 when a long reasoning call outlives its edge timeout.
+        # Both are transient and worth waiting out.
+        retryable = response.status_code == 429 or response.status_code >= 500
+        if retryable and attempt < MAX_RETRIES - 1:
             delay = BACKOFF_SECONDS * (2**attempt)
-            logger.info("vLLM rate limited, retrying in %.0fs", delay)
+            logger.info("vLLM returned %d, retrying in %.0fs", response.status_code, delay)
             time.sleep(delay)
             continue
         break

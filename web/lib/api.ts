@@ -210,6 +210,51 @@ export function saveHighlight(
   });
 }
 
+export type PathConcept = {
+  name: string;
+  type: string;
+  mentions: number;
+  depth: number;
+  explained: boolean;
+};
+
+export type PathStage = {
+  topic: string;
+  position: number;
+  concepts: PathConcept[];
+};
+
+export type PathEdge = {
+  source: string;
+  target: string;
+  reason: string;
+  origin: "timeline" | "model";
+};
+
+export type LearningPath = { stages: PathStage[]; edges: PathEdge[] };
+
+export function getLearningPath(minMentions = 2) {
+  return get<LearningPath>(`/path?min_mentions=${minMentions}`);
+}
+
+export type ConceptDetail = {
+  name: string;
+  type: string;
+  summary: string | null;
+  example: string | null;
+  requires: { name: string; reason: string; origin: string }[];
+  sources: {
+    document_id: string;
+    document_title: string;
+    topic: string;
+    page: number | null;
+  }[];
+};
+
+export function getConcept(name: string) {
+  return get<ConceptDetail>(`/concepts/${encodeURIComponent(name)}`);
+}
+
 export async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
