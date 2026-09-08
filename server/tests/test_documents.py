@@ -8,15 +8,25 @@ client = TestClient(app)
 pytestmark = requires_ingested_corpus
 
 
-def test_lists_ingested_documents():
+def test_lists_every_ingested_document_by_default():
     response = client.get("/documents")
     assert response.status_code == 200
 
     documents = response.json()
-    assert documents, "expected ingested CPE393 documents"
+    assert documents, "expected an ingested corpus"
     first = documents[0]
-    assert {"id", "title", "topic", "activity_type", "file_type"} <= set(first)
-    assert all(d["course"] == "CPE393" for d in documents)
+    assert {"id", "title", "topic", "activity_type", "file_type", "course"} <= set(first)
+
+
+def test_a_course_filter_holds_the_list_to_that_course():
+    documents = client.get("/documents").json()
+    course = documents[0]["course"]
+
+    filtered = client.get("/documents", params={"course": course}).json()
+
+    assert filtered, f"expected documents for {course}"
+    assert all(d["course"] == course for d in filtered)
+    assert len(filtered) <= len(documents)
 
 
 def test_serves_the_original_pdf_bytes():
