@@ -73,3 +73,69 @@ def test_documents_without_a_position_do_not_place_a_concept():
     positions = graph_store.concept_positions(COURSE)
 
     assert "OrderTest Unplaced" not in positions
+
+
+def test_requirement_edges_are_stored_with_their_reason():
+    _write_lecture(1, ["OrderTest Base"])
+    _write_lecture(2, ["OrderTest Built"])
+
+    graph_store.write_requirements(
+        [
+            {
+                "source": "OrderTest Built",
+                "target": "OrderTest Base",
+                "origin": "timeline",
+                "reason": "taught first",
+            }
+        ]
+    )
+
+    with get_driver().session() as session:
+        record = session.run(
+            """
+            MATCH (a:Entity {name: 'OrderTest Built'})-[r:REQUIRES]->(b:Entity)
+            RETURN b.name AS target, r.origin AS origin, r.reason AS reason
+            """
+        ).single()
+
+    assert record["target"] == "OrderTest Base"
+    assert record["origin"] == "timeline"
+    assert record["reason"] == "taught first"
+
+
+def test_rebuilding_replaces_edges_of_one_origin_only():
+    _write_lecture(1, ["OrderTest Base"])
+    _write_lecture(2, ["OrderTest Built"])
+    graph_store.write_requirements(
+        [
+            {
+                "source": "OrderTest Built",
+                "target": "OrderTest Base",
+                "origin": "timeline",
+                "reason": "a",
+            }
+        ]
+    )
+    graph_store.write_requirements(
+        [
+            {
+                "source": "OrderTest Base",
+                "target": "OrderTest Built",
+                "origin": "model",
+                "reason": "b",
+            }
+        ]
+    )
+
+    graph_store.clear_requirements(origin="timeline")
+
+    with get_driver().session() as session:
+        remaining = [
+            record["origin"]
+            for record in session.run(
+                "MATCH (a:Entity)-[r:REQUIRES]->(b:Entity) "
+                "WHERE a.name STARTS WITH 'OrderTest' RETURN r.origin AS origin"
+            )
+        ]
+
+    assert remaining == ["model"]

@@ -196,6 +196,54 @@ def concept_frequency(course: str, document_ids: list[str] | None = None) -> dic
         return {record["name"]: record["documents"] for record in result}
 
 
+def related_concept_pairs(course: str) -> list[tuple[str, str]]:
+    """Concept pairs the material itself connects, in one course."""
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (a:Entity)-[:RELATES_TO]-(b:Entity)
+            WHERE a.name < b.name
+              AND EXISTS {
+                MATCH (:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(a)
+              }
+              AND EXISTS {
+                MATCH (:Document {course: $course})-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(b)
+              }
+            RETURN DISTINCT a.name AS left, b.name AS right
+            """,
+            course=course,
+        )
+        return [(record["left"], record["right"]) for record in result]
+
+
+def write_requirements(edges: list[dict]) -> int:
+    """Store prerequisite edges. (a)-[:REQUIRES]->(b) reads: learn b before a."""
+    if not edges:
+        return 0
+
+    with get_driver().session() as session:
+        summary = session.run(
+            """
+            UNWIND $edges AS edge
+            MATCH (source:Entity {name: edge.source})
+            MATCH (target:Entity {name: edge.target})
+            MERGE (source)-[r:REQUIRES]->(target)
+            SET r.origin = edge.origin, r.reason = edge.reason
+            """,
+            edges=edges,
+        ).consume()
+    return summary.counters.relationships_created
+
+
+def clear_requirements(origin: str | None = None) -> None:
+    """Prerequisites are rebuilt from scratch; stale edges would outlive their reason."""
+    with get_driver().session() as session:
+        session.run(
+            "MATCH ()-[r:REQUIRES]->() WHERE $origin IS NULL OR r.origin = $origin DELETE r",
+            origin=origin,
+        )
+
+
 def clear_document_positions(course: str) -> None:
     """Positions are recomputed from scratch, never accumulated."""
     with get_driver().session() as session:

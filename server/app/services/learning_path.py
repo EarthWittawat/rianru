@@ -60,3 +60,31 @@ def place_activity(
 
     best = max(scores.values())
     return min(position for position, score in scores.items() if score == best) + 0.5
+
+
+def timeline_requirements(
+    pairs: list[tuple[str, str]], positions: dict[str, float]
+) -> list[dict]:
+    """Order related concepts by when the course teaches them.
+
+    Two concepts the material already connects, taught at different points, are
+    a prerequisite pair: the one taught first is what the later one is built on.
+    Concepts introduced together carry no order, and saying otherwise would be
+    inventing a dependency the course never stated.
+    """
+    edges: dict[tuple[str, str], dict] = {}
+
+    for left, right in pairs:
+        first, second = sorted((left, right), key=lambda name: positions.get(name, -1))
+        if first not in positions or second not in positions:
+            continue
+        if positions[first] >= positions[second]:
+            continue
+        edges[(second, first)] = {
+            "source": second,
+            "target": first,
+            "origin": "timeline",
+            "reason": f"{first} is taught before {second} in the course.",
+        }
+
+    return list(edges.values())
