@@ -297,14 +297,56 @@ def document_concepts(course: str) -> dict[str, list[str]]:
         return {record["id"]: [c for c in record["concepts"] if c] for record in result}
 
 
-def similarity_search(query: str, top_k: int = 6) -> list[dict]:
+def chunks_by_id(chunk_ids: list[str]) -> dict[str, dict]:
+    """Hydrate chunk ids into the same shape similarity_search returns."""
+    if not chunk_ids:
+        return {}
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document)-[:HAS_CHUNK]->(c:Chunk)
+            WHERE c.id IN $ids
+            RETURN c.id AS chunk_id, c.text AS text, c.page AS page,
+                   d.id AS document_id, d.title AS document_title, d.topic AS topic
+            """,
+            ids=chunk_ids,
+        )
+        return {record["chunk_id"]: record.data() for record in result}
+
+
+def list_courses() -> list[dict]:
+    """Every course in the graph, with enough to tell them apart."""
+    with get_driver().session() as session:
+        result = session.run(
+            """
+            MATCH (d:Document)
+            OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:Chunk)
+            WITH d.course AS code, count(DISTINCT d) AS documents,
+                 count(DISTINCT c) AS chunks,
+                 count(DISTINCT d.topic) AS topics
+            RETURN code, documents, chunks, topics
+            ORDER BY code
+            """
+        )
+        return [record.data() for record in result if record["code"]]
+
+
+def similarity_search(query: str, top_k: int = 6, course: str | None = None) -> list[dict]:
+    """Nearest chunks, optionally held to one course.
+
+    The index is course-wide, so a course filter has to over-fetch and then cut:
+    asking the index for k and filtering afterwards would return fewer than k, or
+    none at all, whenever another course dominates the neighbourhood.
+    """
     query_embedding = embed_text(query)
+    fetch = top_k * 8 if course else top_k
     with get_driver().session() as session:
         result = session.run(
             f"""
-            CALL db.index.vector.queryNodes('{VECTOR_INDEX}', $top_k, $embedding)
+            CALL db.index.vector.queryNodes('{VECTOR_INDEX}', $fetch, $embedding)
             YIELD node, score
             MATCH (d:Document)-[:HAS_CHUNK]->(node)
+            WHERE $course IS NULL OR d.course = $course
             RETURN node.id AS chunk_id,
                    node.text AS text,
                    node.page AS page,
@@ -313,8 +355,11 @@ def similarity_search(query: str, top_k: int = 6) -> list[dict]:
                    d.topic AS topic,
                    score
             ORDER BY score DESC
+            LIMIT $top_k
             """,
+            fetch=fetch,
             top_k=top_k,
             embedding=query_embedding,
+            course=course,
         )
         return [record.data() for record in result]

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCourse } from "@/lib/course";
 
 const LINKS = [
   { href: "/viewer", label: "Read", note: "Lectures and labs" },
@@ -13,6 +14,7 @@ const LINKS = [
 
 export function NavBar() {
   const pathname = usePathname();
+  const { courses, course, setCourse } = useCourse();
 
   return (
     <header className="border-b border-rule bg-paper">
@@ -65,6 +67,24 @@ export function NavBar() {
             );
           })}
         </ul>
+
+        {courses.length > 1 && (
+          <label className="ml-auto flex shrink-0 items-center gap-2 py-3">
+            <span className="apparatus">Class</span>
+            <select
+              value={course ?? ""}
+              onChange={(event) => setCourse(event.target.value)}
+              aria-label="Class"
+              className="border border-rule bg-paper px-2 py-1 text-fine"
+            >
+              {courses.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.code}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </nav>
     </header>
   );

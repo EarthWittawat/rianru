@@ -1,17 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { listDocuments, type DocumentSummary } from "@/lib/api";
+import { useCourse } from "@/lib/course";
+import { PageSearch } from "@/components/PageSearch";
 
-export const dynamic = "force-dynamic";
+export default function ViewerIndexPage() {
+  const [documents, setDocuments] = useState<DocumentSummary[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const { course } = useCourse();
 
-export default async function ViewerIndexPage() {
-  let documents: DocumentSummary[] = [];
-  let error: string | null = null;
-
-  try {
-    documents = await listDocuments();
-  } catch {
-    error = "Could not reach the API. Is the backend running on port 8000?";
-  }
+  // The list belongs to the class being studied, and that lives in the
+  // browser, so this reads it here rather than on the server.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await listDocuments(course);
+        if (!cancelled) setDocuments(list);
+      } catch {
+        if (!cancelled) {
+          setError("Could not reach the API. Is the backend running on port 8000?");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [course]);
 
   const byTopic = documents.reduce<Record<string, DocumentSummary[]>>((acc, doc) => {
     (acc[doc.topic] ??= []).push(doc);
@@ -25,6 +42,8 @@ export default async function ViewerIndexPage() {
         Open a document, then drag across any passage to have it explained in
         the margin.
       </p>
+
+      <PageSearch />
 
       {error && (
         <p className="ruled-block mt-10 border-rubric px-4 py-3 text-fine text-rubric-deep">
